@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BaaS — Firebase</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -28,7 +29,6 @@
       padding: 40px 20px;
     }
 
-    /* Grid noise overlay */
     body::before {
       content: '';
       position: fixed;
@@ -70,8 +70,73 @@
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.5px;
+      flex: 1;
     }
     .header h1 span { color: var(--accent); }
+
+    /* Auth bar */
+    .auth-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .user-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      object-fit: cover;
+    }
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 9px 16px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-google {
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-google:hover { background: #4a5de8; transform: translateY(-1px); }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 7px 12px;
+    }
+    .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-publish {
+      background: var(--accent);
+      color: #fff;
+      width: 100%;
+      padding: 11px 18px;
+      font-size: 14px;
+    }
+    .btn-publish:hover { background: #4a5de8; transform: translateY(-1px); }
+    .btn-publish:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Google icon SVG */
+    .g-icon { width: 16px; height: 16px; flex-shrink: 0; }
 
     /* Panel */
     .panel {
@@ -107,26 +172,6 @@
     input::placeholder { color: var(--muted); }
     input:focus { border-color: var(--accent); }
 
-    /* Buttons */
-    .btn {
-      padding: 11px 18px;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      width: 100%;
-    }
-    .btn-primary:hover { background: #4a5de8; transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
     /* Search bar */
     .search-wrap {
       position: relative;
@@ -145,6 +190,20 @@
       font-size: 14px;
       pointer-events: none;
     }
+
+    /* Guest banner */
+    .guest-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .guest-banner span { color: var(--accent); }
 
     /* Feed */
     #feed { display: flex; flex-direction: column; gap: 10px; }
@@ -168,6 +227,14 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    .post-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+    }
+
     .post-info { flex: 1; min-width: 0; }
     .post-name {
       font-weight: 700;
@@ -183,6 +250,12 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    .post-text {
+      font-size: 13px;
+      color: var(--text);
+      margin-top: 4px;
+      word-break: break-word;
     }
     .post-time {
       font-family: 'IBM Plex Mono', monospace;
@@ -237,7 +310,7 @@
       font-size: 13px;
     }
 
-    /* Status toast */
+    /* Toast */
     #toast {
       position: fixed;
       bottom: 24px;
@@ -260,20 +333,47 @@
 
 <div class="wrapper">
 
+  <!-- Header с авторизацией -->
   <div class="header">
     <div class="header-dot"></div>
     <h1>Cloud <span>Feed</span></h1>
+
+    <!-- Состояние: не вошёл -->
+    <div class="auth-bar" id="loginArea">
+      <button class="btn btn-google" id="loginBtn">
+        <svg class="g-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Войти
+      </button>
+    </div>
+
+    <!-- Состояние: вошёл -->
+    <div class="auth-bar" id="userArea" style="display:none;">
+      <img id="userPhoto" class="user-avatar" src="" alt="avatar">
+      <span class="user-name" id="userName"></span>
+      <button class="btn btn-logout" id="logoutBtn">Выйти</button>
+    </div>
   </div>
 
-  <div class="panel">
+  <!-- Форма публикации (только для авторизованных) -->
+  <div class="panel" id="messageForm" style="display:none;">
     <div class="panel-label">// новая запись</div>
     <div class="field-row">
-      <input type="text" id="name" placeholder="Имя профиля">
-      <input type="email" id="email" placeholder="Email">
+      <input type="text" id="contentInput" placeholder="Что у вас нового?">
     </div>
-    <button class="btn btn-primary" id="mainBtn">Опубликовать в облако</button>
+    <button class="btn btn-publish" id="mainBtn">Опубликовать в облако</button>
   </div>
 
+  <!-- Баннер для гостей -->
+  <div class="guest-banner" id="guestBanner">
+    // <span>только чтение</span> — войдите через Google, чтобы публиковать записи
+  </div>
+
+  <!-- Поиск -->
   <div class="search-wrap">
     <span class="search-icon">⌕</span>
     <input type="text" id="searchInput" placeholder="Поиск по имени или email...">
@@ -288,9 +388,13 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import {
-    getFirestore, collection, addDoc, query, orderBy, onSnapshot,
-    serverTimestamp, updateDoc, deleteDoc, doc, increment
+    getFirestore, collection, addDoc, query, orderBy,
+    onSnapshot, serverTimestamp, updateDoc, deleteDoc, doc, increment
   } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  import {
+    getAuth, GoogleAuthProvider, signInWithPopup,
+    signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBK0Bq-hvxwqrYeX-ThgbatMsjnFXxsld8",
@@ -301,10 +405,12 @@
     appId: "1:312094362251:web:c44b2d36dcbc7c3adb228e"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  const app      = initializeApp(firebaseConfig);
+  const db       = getFirestore(app);
+  const auth     = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-  // ─── Утилита: toast-уведомление ────────────────────────────────────────────
+  // ── Toast ──────────────────────────────────────────────────────────────────
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -312,32 +418,97 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  // ─── Хранилище всех постов (для клиентской фильтрации) ─────────────────────
-  let allPosts = [];
+  // ── Auth UI ────────────────────────────────────────────────────────────────
+  document.getElementById('loginBtn').onclick  = () => signInWithPopup(auth, provider);
+  document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
-  window.deletePost = async (id) => {
-    const docRef = doc(db, "requests", id);
+  onAuthStateChanged(auth, user => {
+    const loginArea   = document.getElementById('loginArea');
+    const userArea    = document.getElementById('userArea');
+    const messageForm = document.getElementById('messageForm');
+    const guestBanner = document.getElementById('guestBanner');
+
+    if (user) {
+      loginArea.style.display   = 'none';
+      userArea.style.display    = 'flex';
+      messageForm.style.display = 'block';
+      guestBanner.style.display = 'none';
+
+      document.getElementById('userPhoto').src      = user.photoURL || '';
+      document.getElementById('userName').innerText = user.displayName || user.email;
+    } else {
+      loginArea.style.display   = 'flex';
+      userArea.style.display    = 'none';
+      messageForm.style.display = 'none';
+      guestBanner.style.display = 'block';
+    }
+  });
+
+  // ── Публикация ────────────────────────────────────────────────────────────
+  document.getElementById('mainBtn').onclick = async () => {
+    const btn     = document.getElementById('mainBtn');
+    const content = document.getElementById('contentInput').value.trim();
+    const user    = auth.currentUser;
+
+    if (!content) return showToast('✗ Введите текст сообщения');
+    if (!user)    return showToast('✗ Сначала войдите в аккаунт');
+
+    btn.disabled = true;
     try {
-      await deleteDoc(docRef);
-      showToast("✓ Запись удалена");
+      await addDoc(collection(db, "requests"), {
+        name:      user.displayName,
+        email:     user.email,
+        photo:     user.photoURL,
+        text:      content,
+        likes:     0,
+        timestamp: serverTimestamp()
+      });
+      document.getElementById('contentInput').value = '';
+      showToast('✓ Опубликовано');
     } catch (e) {
-      // Security Rule запрещает удаление → попадаем сюда
-      showToast("✗ Удаление запрещено правилами сервера");
-      console.error("Delete blocked:", e.message);
+      showToast('✗ Ошибка безопасности: ' + e.message);
+      console.error('Write blocked:', e.message);
+    }
+    btn.disabled = false;
+  };
+
+  // ── Лайк ──────────────────────────────────────────────────────────────────
+  window.processLike = async (id) => {
+    if (!auth.currentUser) return showToast('✗ Войдите, чтобы лайкать');
+    try {
+      await updateDoc(doc(db, "requests", id), { likes: increment(1) });
+    } catch (e) {
+      showToast('✗ Лайк заблокирован: ' + e.message);
     }
   };
 
-  function filterPosts() {
+  // ── Удаление ──────────────────────────────────────────────────────────────
+  window.deletePost = async (id) => {
+    try {
+      await deleteDoc(doc(db, "requests", id));
+      showToast('✓ Запись удалена');
+    } catch (e) {
+      showToast('✗ Удаление запрещено правилами сервера');
+      console.error('Delete blocked:', e.message);
+    }
+  };
+
+  // ── Поиск (клиентская фильтрация) ────────────────────────────────────────
+  let allPosts = [];
+
+  document.getElementById('searchInput').addEventListener('input', () => {
     const q = document.getElementById('searchInput').value.toLowerCase().trim();
-    if (!q) return renderFeed(allPosts);              // пустой запрос → всё
-    const filtered = allPosts.filter(p =>
+    renderFeed(q ? allPosts.filter(p =>
       p.name.toLowerCase().includes(q) ||
       p.email.toLowerCase().includes(q)
-    );
-    renderFeed(filtered);
-  }
+    ) : allPosts);
+  });
 
-  document.getElementById('searchInput').addEventListener('input', filterPosts);
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
   function renderFeed(posts) {
     const feed = document.getElementById('feed');
@@ -347,9 +518,14 @@
     }
     feed.innerHTML = posts.map(p => `
       <div class="post">
+        <img class="post-avatar"
+             src="${escapeHtml(p.photo || 'https://via.placeholder.com/38')}"
+             alt="avatar"
+             onerror="this.src='https://via.placeholder.com/38'">
         <div class="post-info">
           <div class="post-name">${escapeHtml(p.name)}</div>
           <div class="post-email">${escapeHtml(p.email)}</div>
+          ${p.text ? `<div class="post-text">${escapeHtml(p.text)}</div>` : ''}
           <div class="post-time">${p.time}</div>
         </div>
         <div class="post-actions">
@@ -363,51 +539,28 @@
       </div>`).join('');
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  window.processLike = async (id) => {
-    const docRef = doc(db, "requests", id);
-    try {
-      await updateDoc(docRef, { likes: increment(1) });
-    } catch (e) {
-      console.error("Like error:", e.message);
-    }
-  };
-
-  document.getElementById('mainBtn').onclick = async () => {
-    const btn = document.getElementById('mainBtn');
-    btn.disabled = true;
-    try {
-      await addDoc(collection(db, "requests"), {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        likes: 0,
-        timestamp: serverTimestamp()
-      });
-      document.getElementById('name').value = "";
-      document.getElementById('email').value = "";
-      showToast("✓ Опубликовано");
-    } catch (e) {
-      showToast("✗ Ошибка валидации сервера");
-    }
-    btn.disabled = false;
-  };
-
+  // ── Realtime listener ─────────────────────────────────────────────────────
   const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
-  onSnapshot(q, (snapshot) => {
+  onSnapshot(q, snapshot => {
     allPosts = snapshot.docs.map(d => ({
-      id: d.id,
-      name: d.data().name || '—',
+      id:    d.id,
+      name:  d.data().name  || '—',
       email: d.data().email || '—',
+      photo: d.data().photo || '',
+      text:  d.data().text  || '',
       likes: d.data().likes || 0,
-      time: d.data().timestamp?.toDate().toLocaleTimeString('ru') || '...'
+      time:  d.data().timestamp?.toDate().toLocaleTimeString('ru') || '...'
     }));
-    filterPosts();
+    const sq = document.getElementById('searchInput').value.toLowerCase().trim();
+    renderFeed(sq ? allPosts.filter(p =>
+      p.name.toLowerCase().includes(sq) ||
+      p.email.toLowerCase().includes(sq)
+    ) : allPosts);
   });
+
+  // ── Для тестов в консоли F12 ──────────────────────────────────────────────
+  window.db   = db;
+  window.auth = auth;
 </script>
 </body>
 </html>
