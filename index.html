@@ -15,8 +15,6 @@
       --text: #e8e8f0;
       --muted: #6b6b7a;
       --danger: #f87171;
-      --bubble-in: #1c1c20;
-      --bubble-out: #5b6ef5;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +39,6 @@
       pointer-events: none; z-index: 0;
     }
 
-    /* ── Layout ── */
     .app {
       position: relative; z-index: 1;
       display: flex; flex-direction: column;
@@ -49,7 +46,7 @@
       margin: 0 auto; width: 100%;
     }
 
-    /* ── Top bar ── */
+    /* ── Topbar ── */
     .topbar {
       display: flex; align-items: center;
       padding: 14px 20px; gap: 14px;
@@ -69,7 +66,6 @@
     .topbar-title { font-size: 16px; font-weight: 800; letter-spacing: -.3px; flex: 1; }
     .topbar-title span { color: var(--accent); }
 
-    /* User pill */
     .user-pill {
       display: flex; align-items: center; gap: 8px;
       background: var(--surface2); border: 1px solid var(--border);
@@ -77,6 +73,7 @@
     }
     .user-pill img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
     .user-pill-name { font-size: 13px; font-weight: 600; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
     .btn-logout {
       background: transparent; border: 1px solid var(--border); color: var(--muted);
       font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600;
@@ -84,10 +81,8 @@
     }
     .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
 
-    /* ── Login screen ── */
-    #loginScreen {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-    }
+    /* ── Login ── */
+    #loginScreen { flex: 1; display: flex; align-items: center; justify-content: center; }
     .login-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 20px; padding: 40px; text-align: center; max-width: 340px; width: 100%;
@@ -107,12 +102,9 @@
 
     /* ── Chat layout ── */
     #chatScreen { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+    .chat-body  { flex: 1; display: flex; overflow: hidden; }
 
-    .chat-body {
-      flex: 1; display: flex; overflow: hidden;
-    }
-
-    /* ── Sidebar (users list) ── */
+    /* ── Sidebar ── */
     .sidebar {
       width: 220px; flex-shrink: 0;
       background: var(--surface); border-right: 1px solid var(--border);
@@ -130,10 +122,10 @@
 
     .user-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px 10px; border-radius: 10px; cursor: pointer;
-      transition: background .15s; position: relative;
+      padding: 10px; border-radius: 10px; cursor: pointer;
+      transition: background .15s;
     }
-    .user-item:hover { background: var(--surface2); }
+    .user-item:hover  { background: var(--surface2); }
     .user-item.active { background: rgba(91,110,245,.15); }
     .user-item.active .user-item-name { color: var(--accent); }
 
@@ -142,35 +134,12 @@
       border: 2px solid var(--border); flex-shrink: 0;
     }
     .user-item-info { flex: 1; min-width: 0; }
-    .user-item-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-item-name    { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .user-item-preview { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'IBM Plex Mono', monospace; }
 
-    .unread-badge {
-      background: var(--accent); color: #fff;
-      font-size: 10px; font-weight: 700;
-      width: 18px; height: 18px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
+    /* ── Chat panel ── */
+    .chat-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* ── Main chat panel ── */
-    .chat-panel {
-      flex: 1; display: flex; flex-direction: column; overflow: hidden;
-    }
-
-    .chat-header {
-      padding: 14px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-      background: var(--surface);
-    }
-    .chat-header-avatar {
-      width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
-      border: 2px solid var(--border);
-    }
-    .chat-header-name { font-size: 15px; font-weight: 700; }
-    .chat-header-status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); }
-
-    /* Empty state */
     .chat-empty {
       flex: 1; display: flex; align-items: center; justify-content: center;
       flex-direction: column; gap: 8px;
@@ -178,7 +147,18 @@
     }
     .chat-empty-icon { font-size: 32px; opacity: .4; }
 
-    /* Messages */
+    .active-chat { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+
+    .chat-header {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+      background: var(--surface);
+    }
+    .chat-header-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+    .chat-header-name   { font-size: 15px; font-weight: 700; }
+    .chat-header-status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); }
+
+    /* ── Messages ── */
     .messages {
       flex: 1; overflow-y: auto; padding: 16px 20px;
       display: flex; flex-direction: column; gap: 6px;
@@ -186,16 +166,13 @@
     .messages::-webkit-scrollbar { width: 4px; }
     .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* Date divider */
     .date-divider {
       text-align: center; margin: 8px 0;
       font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted);
     }
 
-    /* Message bubble */
     .msg { display: flex; flex-direction: column; max-width: 72%; animation: msgIn .2s ease; }
     @keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-
     .msg.out { align-self: flex-end; align-items: flex-end; }
     .msg.in  { align-self: flex-start; align-items: flex-start; }
 
@@ -203,14 +180,12 @@
       padding: 10px 14px; border-radius: 16px;
       font-size: 14px; line-height: 1.5; word-break: break-word;
     }
-    .msg.in  .msg-bubble { background: var(--bubble-in); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-    .msg.out .msg-bubble { background: var(--bubble-out); color: #fff; border-bottom-right-radius: 4px; }
+    .msg.in  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .msg.out .msg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
 
-    /* Image in bubble */
-    .msg-bubble img.msg-img {
+    .msg-img {
       max-width: 220px; max-height: 220px; border-radius: 10px;
-      display: block; cursor: zoom-in; object-fit: cover;
-      margin-top: 4px;
+      display: block; cursor: zoom-in; object-fit: cover; margin-top: 4px;
     }
 
     .msg-time {
@@ -218,7 +193,7 @@
       color: var(--muted); margin-top: 3px; padding: 0 2px;
     }
 
-    /* Input area */
+    /* ── Input ── */
     .input-area {
       padding: 14px 16px; border-top: 1px solid var(--border);
       background: var(--surface); display: flex; gap: 10px; align-items: flex-end;
@@ -230,60 +205,55 @@
       background: var(--surface2); border: 1px solid var(--border);
       color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px;
       padding: 11px 14px; border-radius: 10px; outline: none;
-      resize: none; transition: border-color .2s; max-height: 120px;
-      line-height: 1.4;
+      resize: none; transition: border-color .2s; max-height: 120px; line-height: 1.4;
     }
     .msg-input::placeholder { color: var(--muted); }
     .msg-input:focus { border-color: var(--accent); }
 
-    /* Image attach strip */
     .attach-strip {
       display: none; align-items: center; gap: 8px;
       background: var(--surface2); border: 1px solid var(--border);
       border-radius: 8px; padding: 6px 10px;
     }
     .attach-strip.visible { display: flex; }
-    .attach-thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
-    .attach-name { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .attach-thumb  { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
+    .attach-name   { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .attach-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0 4px; }
     .attach-remove:hover { color: var(--danger); }
 
-    /* Send + attach buttons */
     .input-actions { display: flex; gap: 8px; }
     .btn-attach {
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--muted); width: 42px; height: 42px; border-radius: 10px;
-      cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+      width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
       transition: all .2s; flex-shrink: 0;
     }
     .btn-attach:hover { border-color: var(--accent); color: var(--accent); }
     .btn-send {
       background: var(--accent); border: none; color: #fff;
-      width: 42px; height: 42px; border-radius: 10px;
-      cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
       transition: all .2s; flex-shrink: 0;
     }
     .btn-send:hover { background: #4a5de8; transform: translateY(-1px); }
     .btn-send:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    /* hidden real file input */
     #fileInput { display: none; }
 
     /* ── Lightbox ── */
-    #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:300; align-items:center; justify-content:center; cursor:zoom-out; }
-    #lightbox.open { display:flex; }
-    #lightboxImg { max-width:90vw; max-height:90vh; border-radius:10px; object-fit:contain; }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 300; align-items: center; justify-content: center; cursor: zoom-out; }
+    #lightbox.open { display: flex; }
+    #lightboxImg { max-width: 90vw; max-height: 90vh; border-radius: 10px; object-fit: contain; }
 
     /* ── Toast ── */
     #toast {
-      position:fixed; bottom:20px; left:50%;
-      transform:translateX(-50%) translateY(80px);
-      background:var(--surface2); border:1px solid var(--border); color:var(--text);
-      font-size:13px; font-family:'IBM Plex Mono',monospace;
-      padding:10px 20px; border-radius:30px; transition:transform .3s ease; z-index:200;
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      font-size: 13px; font-family: 'IBM Plex Mono', monospace;
+      padding: 10px 20px; border-radius: 30px; transition: transform .3s ease; z-index: 200;
     }
-    #toast.show { transform:translateX(-50%) translateY(0); }
+    #toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* Scrollbar global */
     * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
   </style>
 </head>
@@ -291,7 +261,7 @@
 
 <div class="app">
 
-  <!-- Top bar -->
+  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-dot"></div>
     <div class="topbar-title">Private <span>Chat</span></div>
@@ -304,13 +274,13 @@
     </div>
   </div>
 
-  <!-- LOGIN SCREEN -->
+  <!-- LOGIN -->
   <div id="loginScreen">
     <div class="login-card">
       <h2>Private <span>Chat</span></h2>
       <p>// войдите чтобы начать переписку</p>
       <button class="btn-google" id="loginBtn">
-        <svg class="g-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg class="g-icon" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
@@ -321,30 +291,24 @@
     </div>
   </div>
 
-  <!-- CHAT SCREEN -->
+  <!-- CHAT -->
   <div id="chatScreen">
     <div class="chat-body">
 
       <!-- Sidebar -->
       <div class="sidebar">
         <div class="sidebar-header">// собеседники</div>
-        <div class="users-list" id="usersList">
-          <div style="padding:20px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);">
-            Загрузка...
-          </div>
-        </div>
+        <div class="users-list" id="usersList"></div>
       </div>
 
-      <!-- Chat panel -->
-      <div class="chat-panel" id="chatPanel">
-        <!-- Empty state -->
+      <!-- Panel -->
+      <div class="chat-panel">
         <div class="chat-empty" id="chatEmpty">
           <div class="chat-empty-icon">💬</div>
           <div>// выберите собеседника</div>
         </div>
 
-        <!-- Active chat -->
-        <div id="activeChat" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+        <div class="active-chat" id="activeChat">
           <div class="chat-header">
             <img class="chat-header-avatar" id="chatAvatar" src="" alt="">
             <div>
@@ -376,185 +340,195 @@
 
 </div>
 
-<!-- Lightbox -->
-<div id="lightbox" onclick="closeLightbox()">
-  <img id="lightboxImg" src="" alt="full">
+<div id="lightbox" onclick="document.getElementById('lightbox').classList.remove('open')">
+  <img id="lightboxImg" src="" alt="">
 </div>
-
 <div id="toast"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import {
-    getFirestore, collection, doc, addDoc, setDoc, getDoc,
-    query, where, orderBy, onSnapshot, serverTimestamp, updateDoc, increment
+    getFirestore, collection, doc, addDoc, setDoc,
+    query, orderBy, onSnapshot, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
   import {
     getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-  const firebaseConfig = {
+  const app = initializeApp({
     apiKey: "AIzaSyBK0Bq-hvxwqrYeX-ThgbatMsjnFXxsld8",
     authDomain: "jeffrey-epstein-ed456.firebaseapp.com",
     projectId: "jeffrey-epstein-ed456",
     storageBucket: "jeffrey-epstein-ed456.firebasestorage.app",
     messagingSenderId: "312094362251",
     appId: "1:312094362251:web:c44b2d36dcbc7c3adb228e"
-  };
+  });
 
-  const app      = initializeApp(firebaseConfig);
   const db       = getFirestore(app);
   const auth     = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  let currentUser  = null;
-  let activePeer   = null;   // { uid, name, photo }
-  let unsubMessages = null;  // слушатель сообщений
-  let unsubUsers    = null;  // слушатель пользователей
+  let me           = null;   // текущий пользователь
+  let activePeer   = null;   // выбранный собеседник { uid, name, photo }
+  let unsubMsgs    = null;   // отписка от listener сообщений
+  let unsubUsers   = null;   // отписка от listener пользователей
+  let usersCache   = {};     // uid -> данные пользователя
 
-  // ── Toast ──────────────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function chatId(a, b) { return [a, b].sort().join('_'); }
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
-
-  // ── Lightbox ───────────────────────────────────────────────────────────────
-  window.openLightbox = src => {
-    document.getElementById('lightboxImg').src = src;
-    document.getElementById('lightbox').classList.add('open');
-  };
-  window.closeLightbox = () => document.getElementById('lightbox').classList.remove('open');
+  function show(id, v) { document.getElementById(id).style.display = v; }
 
   // ── Auth ───────────────────────────────────────────────────────────────────
-  document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
+  document.getElementById('loginBtn').onclick  = () => signInWithPopup(auth, provider).catch(() => {});
   document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
   onAuthStateChanged(auth, async user => {
+    me = user;
     if (user) {
-      currentUser = user;
-      // Сохраняем / обновляем профиль в Firestore
-      await setDoc(doc(db, "users", user.uid), {
+      // Сохраняем профиль в Firestore
+      await setDoc(doc(db, 'users', user.uid), {
         uid:   user.uid,
-        name:  user.displayName,
-        photo: user.photoURL,
-        email: user.email,
+        name:  user.displayName || '',
+        photo: user.photoURL    || '',
+        email: user.email       || '',
         lastSeen: serverTimestamp()
       }, { merge: true });
 
-      document.getElementById('loginScreen').style.display   = 'none';
-      document.getElementById('chatScreen').style.display    = 'flex';
-      document.getElementById('topbarUser').style.display    = 'flex';
-      document.getElementById('myAvatar').src               = user.photoURL || '';
-      document.getElementById('myName').innerText            = user.displayName || user.email;
-
-      loadUsers();
+      show('loginScreen',  'none');
+      show('chatScreen',   'flex');
+      show('topbarUser',   'flex');
+      document.getElementById('myAvatar').src      = user.photoURL || '';
+      document.getElementById('myName').innerText  = user.displayName || user.email;
+      startListeningUsers();
     } else {
-      currentUser = null;
-      activePeer  = null;
-      document.getElementById('loginScreen').style.display   = 'flex';
-      document.getElementById('chatScreen').style.display    = 'none';
-      document.getElementById('topbarUser').style.display    = 'none';
-      if (unsubUsers)    { unsubUsers();    unsubUsers = null; }
-      if (unsubMessages) { unsubMessages(); unsubMessages = null; }
+      show('loginScreen', 'flex');
+      show('chatScreen',  'none');
+      show('topbarUser',  'none');
+      if (unsubMsgs)  { unsubMsgs();  unsubMsgs  = null; }
+      if (unsubUsers) { unsubUsers(); unsubUsers = null; }
+      activePeer = null;
     }
   });
 
   // ── Список пользователей ───────────────────────────────────────────────────
-  function loadUsers() {
+  function startListeningUsers() {
     if (unsubUsers) unsubUsers();
-    unsubUsers = onSnapshot(collection(db, "users"), snapshot => {
-      const list = document.getElementById('usersList');
-      const users = snapshot.docs
-        .map(d => d.data())
-        .filter(u => u.uid !== currentUser.uid);
-
-      if (!users.length) {
-        list.innerHTML = `<div style="padding:20px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted);">// пока никого нет</div>`;
-        return;
-      }
-
-      list.innerHTML = users.map(u => `
-        <div class="user-item ${activePeer?.uid === u.uid ? 'active' : ''}"
-             onclick="selectUser('${u.uid}', ${JSON.stringify(u.name).replace(/'/g,"\\'")} , '${u.photo || ''}')">
-          <img class="user-item-avatar"
-               src="${u.photo || 'https://via.placeholder.com/36'}"
-               alt=""
-               onerror="this.src='https://via.placeholder.com/36'">
-          <div class="user-item-info">
-            <div class="user-item-name">${escHtml(u.name || u.email)}</div>
-            <div class="user-item-preview">${escHtml(u.email || '')}</div>
-          </div>
-        </div>`).join('');
+    unsubUsers = onSnapshot(collection(db, 'users'), snap => {
+      usersCache = {};
+      snap.docs.forEach(d => { usersCache[d.id] = d.data(); });
+      renderUsersList();
     });
   }
 
-  // ── Выбор собеседника ──────────────────────────────────────────────────────
-  window.selectUser = (uid, name, photo) => {
-    activePeer = { uid, name, photo };
+  function renderUsersList() {
+    const list  = document.getElementById('usersList');
+    const peers = Object.values(usersCache).filter(u => u.uid !== me?.uid);
+
+    if (!peers.length) {
+      list.innerHTML = '<div style="padding:20px 10px;font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:var(--muted);">// пока никого нет</div>';
+      return;
+    }
+
+    list.innerHTML = '';
+    peers.forEach(u => {
+      const el = document.createElement('div');
+      el.className = 'user-item' + (activePeer?.uid === u.uid ? ' active' : '');
+      el.innerHTML = `
+        <img class="user-item-avatar"
+             src="${esc(u.photo || 'https://via.placeholder.com/36')}"
+             alt=""
+             onerror="this.src='https://via.placeholder.com/36'">
+        <div class="user-item-info">
+          <div class="user-item-name">${esc(u.name || u.email)}</div>
+          <div class="user-item-preview">${esc(u.email || '')}</div>
+        </div>`;
+      // ключевое место: передаём uid через closure, не через HTML-атрибут
+      el.addEventListener('click', () => openChat(u.uid));
+      list.appendChild(el);
+    });
+  }
+
+  // ── Открыть чат ───────────────────────────────────────────────────────────
+  function openChat(uid) {
+    const u = usersCache[uid];
+    if (!u) return;
+
+    activePeer = u;
+    renderUsersList(); // обновить подсветку active
 
     document.getElementById('chatEmpty').style.display  = 'none';
     document.getElementById('activeChat').style.display = 'flex';
-    document.getElementById('chatName').innerText       = name;
-    document.getElementById('chatAvatar').src           = photo || 'https://via.placeholder.com/36';
+    document.getElementById('chatName').innerText        = u.name || u.email;
+    document.getElementById('chatAvatar').src            = u.photo || 'https://via.placeholder.com/36';
 
-    // Перерисовываем sidebar чтобы подсветить активного
-    loadUsers();
     listenMessages();
-  };
-
-  // ── Ключ чата (детерминированный для пары пользователей) ──────────────────
-  function chatId(uid1, uid2) {
-    return [uid1, uid2].sort().join('_');
   }
 
-  // ── Слушатель сообщений ────────────────────────────────────────────────────
+  // ── Сообщения ─────────────────────────────────────────────────────────────
   function listenMessages() {
-    if (unsubMessages) unsubMessages();
-    const cid = chatId(currentUser.uid, activePeer.uid);
-    const q = query(
-      collection(db, "chats", cid, "messages"),
-      orderBy("timestamp", "asc")
-    );
-    unsubMessages = onSnapshot(q, snapshot => {
+    if (unsubMsgs) unsubMsgs();
+
+    const cid = chatId(me.uid, activePeer.uid);
+    const q   = query(collection(db, 'chats', cid, 'messages'), orderBy('timestamp', 'asc'));
+
+    unsubMsgs = onSnapshot(q, snap => {
       const box = document.getElementById('messages');
       let lastDate = '';
-      box.innerHTML = snapshot.docs.map(d => {
-        const m = d.data();
-        const isOut = m.senderUid === currentUser.uid;
-        const date = m.timestamp?.toDate();
-        const dateStr = date ? date.toLocaleDateString('ru', { day:'numeric', month:'long' }) : '';
-        const timeStr = date ? date.toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' }) : '...';
+      let html = '';
 
-        let divider = '';
-        if (dateStr && dateStr !== lastDate) {
-          lastDate = dateStr;
-          divider = `<div class="date-divider">${dateStr}</div>`;
+      snap.docs.forEach(d => {
+        const m      = d.data();
+        const isOut  = m.senderUid === me.uid;
+        const date   = m.timestamp?.toDate();
+        const ds     = date ? date.toLocaleDateString('ru', { day:'numeric', month:'long' }) : '';
+        const ts     = date ? date.toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' }) : '...';
+
+        if (ds && ds !== lastDate) {
+          lastDate = ds;
+          html += `<div class="date-divider">${ds}</div>`;
         }
 
-        const imgHtml = m.image
-          ? `<img class="msg-img" src="${m.image}" alt="photo" onclick="openLightbox(this.src)">`
-          : '';
-        const textHtml = m.text ? `<span>${escHtml(m.text)}</span>` : '';
+        const imgHtml  = m.image ? `<img class="msg-img" src="${m.image}" alt="photo">` : '';
+        const textHtml = m.text  ? `<span>${esc(m.text)}</span>` : '';
 
-        return `${divider}
+        html += `
           <div class="msg ${isOut ? 'out' : 'in'}">
             <div class="msg-bubble">${textHtml}${imgHtml}</div>
-            <div class="msg-time">${timeStr}</div>
+            <div class="msg-time">${ts}</div>
           </div>`;
-      }).join('');
+      });
 
-      // Прокрутка вниз
+      box.innerHTML = html;
+
+      // Клики на картинки в сообщениях
+      box.querySelectorAll('.msg-img').forEach(img => {
+        img.addEventListener('click', () => {
+          document.getElementById('lightboxImg').src = img.src;
+          document.getElementById('lightbox').classList.add('open');
+        });
+      });
+
       box.scrollTop = box.scrollHeight;
     });
   }
 
-  // ── Изображение ───────────────────────────────────────────────────────────
-  const MAX_BYTES = 256 * 1024; // 256 КБ на сообщение
+  // ── Прикрепление картинки ─────────────────────────────────────────────────
+  const MAX_BYTES = 256 * 1024;
   let pendingImage = null;
 
-  document.getElementById('btnAttach').onclick = () => document.getElementById('fileInput').click();
+  document.getElementById('btnAttach').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+  });
+
   document.getElementById('fileInput').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -566,14 +540,14 @@
     const reader = new FileReader();
     reader.onload = ev => {
       pendingImage = ev.target.result;
-      document.getElementById('attachThumb').src     = pendingImage;
+      document.getElementById('attachThumb').src      = pendingImage;
       document.getElementById('attachName').innerText = file.name;
       document.getElementById('attachStrip').classList.add('visible');
     };
     reader.readAsDataURL(file);
   });
 
-  document.getElementById('attachRemove').onclick = clearAttach;
+  document.getElementById('attachRemove').addEventListener('click', clearAttach);
   function clearAttach() {
     pendingImage = null;
     document.getElementById('fileInput').value = '';
@@ -582,40 +556,36 @@
   }
 
   // ── Отправка ───────────────────────────────────────────────────────────────
-  document.getElementById('btnSend').onclick = sendMessage;
+  document.getElementById('btnSend').addEventListener('click', sendMessage);
   document.getElementById('msgInput').addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
-
-  // Авто-resize textarea
   document.getElementById('msgInput').addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
   });
 
   async function sendMessage() {
-    if (!activePeer) return;
+    if (!activePeer || !me) return;
     const input = document.getElementById('msgInput');
     const text  = input.value.trim();
     if (!text && !pendingImage) return;
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true;
-
     try {
-      const cid = chatId(currentUser.uid, activePeer.uid);
+      const cid     = chatId(me.uid, activePeer.uid);
       const payload = {
-        senderUid:   currentUser.uid,
-        senderName:  currentUser.displayName,
-        senderPhoto: currentUser.photoURL,
+        senderUid:   me.uid,
+        senderName:  me.displayName || '',
+        senderPhoto: me.photoURL    || '',
         text:        text,
         timestamp:   serverTimestamp()
       };
       if (pendingImage) payload.image = pendingImage;
 
-      await addDoc(collection(db, "chats", cid, "messages"), payload);
-
-      input.value  = '';
+      await addDoc(collection(db, 'chats', cid, 'messages'), payload);
+      input.value = '';
       input.style.height = 'auto';
       clearAttach();
     } catch (e) {
@@ -623,13 +593,6 @@
       console.error(e);
     }
     btn.disabled = false;
-  }
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
