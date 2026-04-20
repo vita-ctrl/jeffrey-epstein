@@ -381,9 +381,14 @@
   db.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
       currentUser = session.user;
-      await ensureProfile(currentUser);
+      const meta = currentUser.user_metadata || {};
+      renderMyCard({
+        username: meta.full_name || meta.name || currentUser.email?.split("@")[0] || "User",
+        avatar_url: meta.avatar_url || meta.picture || null,
+        status: "online"
+      });
       showApp();
-      loadAll();
+      ensureProfile(currentUser).then(() => loadAll()).catch(console.error);
     } else {
       currentUser = null;
       showLogin();
