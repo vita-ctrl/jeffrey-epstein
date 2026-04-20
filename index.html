@@ -1,599 +1,390 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Private Cloud Chat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Монитор статусов</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
-      --bg: #0d0d0f;
-      --surface: #141416;
-      --surface2: #1c1c20;
-      --border: #2a2a30;
-      --accent: #5b6ef5;
-      --text: #e8e8f0;
-      --muted: #6b6b7a;
-      --danger: #f87171;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Syne', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff 60%, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+      margin-bottom: 36px;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 20px;
+    }
+
+    /* LOGIN */
+    #loginScreen {
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .login-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .login-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+    .login-desc { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 32px; line-height: 1.6; }
+
+    .btn-google {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-google:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); transform: translateY(-1px); }
+    .btn-google:active { transform: scale(0.98); }
+
+    /* APP */
+    #appScreen { display: none; width: 100%; max-width: 480px; }
+
+    .my-card { padding: 28px 32px; margin-bottom: 32px; }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 16px;
+    }
+
+    .status-row { display: flex; align-items: center; gap: 12px; }
+
+    .avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.05rem;
+      flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.25);
       overflow: hidden;
     }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(91,110,245,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(91,110,245,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none; z-index: 0;
-    }
+    .user-info { flex: 1; min-width: 0; }
+    .username { font-weight: 600; font-size: 1rem; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-email { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .app {
-      position: relative; z-index: 1;
-      display: flex; flex-direction: column;
-      height: 100vh; max-width: 900px;
-      margin: 0 auto; width: 100%;
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 500;
     }
+    .dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
 
-    /* ── Topbar ── */
-    .topbar {
-      display: flex; align-items: center;
-      padding: 14px 20px; gap: 14px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .topbar-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent); box-shadow: 0 0 10px var(--accent);
-      animation: pulse 2s infinite; flex-shrink: 0;
-    }
     @keyframes pulse {
-      0%,100% { opacity:1; transform:scale(1); }
-      50%      { opacity:.5; transform:scale(.8); }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
     }
-    .topbar-title { font-size: 16px; font-weight: 800; letter-spacing: -.3px; flex: 1; }
-    .topbar-title span { color: var(--accent); }
 
-    .user-pill {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 30px; padding: 6px 12px 6px 6px;
+    .badge-online  { background: rgba(7,202,107,0.2);  color: #07CA6B; }
+    .badge-online .dot  { background: #07CA6B; }
+    .badge-away    { background: rgba(232,149,88,0.2); color: #E89558; }
+    .badge-away .dot    { background: #E89558; }
+    .badge-busy    { background: rgba(234,33,67,0.2);  color: #EA2143; }
+    .badge-busy .dot    { background: #EA2143; }
+    .badge-offline { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
+    .badge-offline .dot { background: rgba(255,255,255,0.4); animation: none; }
+
+    .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+
+    .btn {
+      padding: 8px 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
+      color: #fff; font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
-    .user-pill img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
-    .user-pill-name { font-size: 13px; font-weight: 600; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+    .btn:active { transform: scale(0.97); }
+    .btn.active-online  { background: rgba(7,202,107,0.25);  border-color: #07CA6B; color: #07CA6B; }
+    .btn.active-away    { background: rgba(232,149,88,0.25); border-color: #E89558; color: #E89558; }
+    .btn.active-busy    { background: rgba(234,33,67,0.25);  border-color: #EA2143; color: #EA2143; }
+    .btn.active-offline { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.5); }
 
     .btn-logout {
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600;
-      padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: all .2s;
+      margin-top: 16px;
+      padding: 7px 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: transparent;
+      color: rgba(255,255,255,0.35); font-size: 0.78rem;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
-    .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-logout:hover { color: #EA2143; border-color: rgba(234,33,67,0.4); }
 
-    /* ── Login ── */
-    #loginScreen { flex: 1; display: flex; align-items: center; justify-content: center; }
-    .login-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 20px; padding: 40px; text-align: center; max-width: 340px; width: 100%;
-    }
-    .login-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-    .login-card h2 span { color: var(--accent); }
-    .login-card p { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 28px; }
-    .btn-google {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: var(--accent); color: #fff;
-      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
-      padding: 13px 24px; border: none; border-radius: 10px; cursor: pointer;
-      transition: all .2s; width: 100%; justify-content: center;
-    }
-    .btn-google:hover { background: #4a5de8; transform: translateY(-1px); }
-    .g-icon { width: 18px; height: 18px; flex-shrink: 0; }
-
-    /* ── Chat layout ── */
-    #chatScreen { flex: 1; display: none; flex-direction: column; overflow: hidden; }
-    .chat-body  { flex: 1; display: flex; overflow: hidden; }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      width: 220px; flex-shrink: 0;
-      background: var(--surface); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    .sidebar-header {
-      padding: 14px 16px 10px;
-      font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-      color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
-      border-bottom: 1px solid var(--border); flex-shrink: 0;
-    }
-    .users-list { flex: 1; overflow-y: auto; padding: 8px; }
-    .users-list::-webkit-scrollbar { width: 4px; }
-    .users-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .list-card { padding: 24px 28px; }
+    .user-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
 
     .user-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px; border-radius: 10px; cursor: pointer;
-      transition: background .15s;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: background 0.2s;
     }
-    .user-item:hover  { background: var(--surface2); }
-    .user-item.active { background: rgba(91,110,245,.15); }
-    .user-item.active .user-item-name { color: var(--accent); }
+    .user-item:hover { background: rgba(255,255,255,0.1); }
 
-    .user-item-avatar {
-      width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
-      border: 2px solid var(--border); flex-shrink: 0;
+    .av-sm {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 600; flex-shrink: 0; overflow: hidden;
     }
-    .user-item-info { flex: 1; min-width: 0; }
-    .user-item-name    { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-item-preview { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'IBM Plex Mono', monospace; }
+    .av-sm img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* ── Chat panel ── */
-    .chat-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .item-name { font-weight: 500; font-size: 0.9rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .chat-empty {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 8px;
-      font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--muted);
+    .loader { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+
+    .footer {
+      margin-top: 24px; font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      display: flex; align-items: center;
     }
-    .chat-empty-icon { font-size: 32px; opacity: .4; }
-
-    .active-chat { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-
-    .chat-header {
-      padding: 14px 20px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-      background: var(--surface);
-    }
-    .chat-header-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
-    .chat-header-name   { font-size: 15px; font-weight: 700; }
-    .chat-header-status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); }
-
-    /* ── Messages ── */
-    .messages {
-      flex: 1; overflow-y: auto; padding: 16px 20px;
-      display: flex; flex-direction: column; gap: 6px;
-    }
-    .messages::-webkit-scrollbar { width: 4px; }
-    .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-    .date-divider {
-      text-align: center; margin: 8px 0;
-      font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted);
+    .realtime-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #07CA6B; display: inline-block;
+      margin-right: 6px; animation: pulse 2s infinite;
     }
 
-    .msg { display: flex; flex-direction: column; max-width: 72%; animation: msgIn .2s ease; }
-    @keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-    .msg.out { align-self: flex-end; align-items: flex-end; }
-    .msg.in  { align-self: flex-start; align-items: flex-start; }
-
-    .msg-bubble {
-      padding: 10px 14px; border-radius: 16px;
-      font-size: 14px; line-height: 1.5; word-break: break-word;
-    }
-    .msg.in  .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-    .msg.out .msg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-
-    .msg-img {
-      max-width: 220px; max-height: 220px; border-radius: 10px;
-      display: block; cursor: zoom-in; object-fit: cover; margin-top: 4px;
-    }
-
-    .msg-time {
-      font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-      color: var(--muted); margin-top: 3px; padding: 0 2px;
-    }
-
-    /* ── Input ── */
-    .input-area {
-      padding: 14px 16px; border-top: 1px solid var(--border);
-      background: var(--surface); display: flex; gap: 10px; align-items: flex-end;
-      flex-shrink: 0;
-    }
-    .input-wrap { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-
-    .msg-input {
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px;
-      padding: 11px 14px; border-radius: 10px; outline: none;
-      resize: none; transition: border-color .2s; max-height: 120px; line-height: 1.4;
-    }
-    .msg-input::placeholder { color: var(--muted); }
-    .msg-input:focus { border-color: var(--accent); }
-
-    .attach-strip {
-      display: none; align-items: center; gap: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 10px;
-    }
-    .attach-strip.visible { display: flex; }
-    .attach-thumb  { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
-    .attach-name   { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .attach-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0 4px; }
-    .attach-remove:hover { color: var(--danger); }
-
-    .input-actions { display: flex; gap: 8px; }
-    .btn-attach {
-      background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
-      width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
-      font-size: 18px; display: flex; align-items: center; justify-content: center;
-      transition: all .2s; flex-shrink: 0;
-    }
-    .btn-attach:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-send {
-      background: var(--accent); border: none; color: #fff;
-      width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
-      font-size: 18px; display: flex; align-items: center; justify-content: center;
-      transition: all .2s; flex-shrink: 0;
-    }
-    .btn-send:hover { background: #4a5de8; transform: translateY(-1px); }
-    .btn-send:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    #fileInput { display: none; }
-
-    /* ── Lightbox ── */
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 300; align-items: center; justify-content: center; cursor: zoom-out; }
-    #lightbox.open { display: flex; }
-    #lightboxImg { max-width: 90vw; max-height: 90vh; border-radius: 10px; object-fit: contain; }
-
-    /* ── Toast ── */
-    #toast {
-      position: fixed; bottom: 20px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-      font-size: 13px; font-family: 'IBM Plex Mono', monospace;
-      padding: 10px 20px; border-radius: 30px; transition: transform .3s ease; z-index: 200;
-    }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-
-    * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    #loadingScreen { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 60px; }
   </style>
 </head>
 <body>
 
-<div class="app">
+  <h1>Монитор статусов</h1>
+  <p class="subtitle">Realtime · Supabase</p>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="topbar-dot"></div>
-    <div class="topbar-title">Private <span>Chat</span></div>
-    <div id="topbarUser" style="display:none; align-items:center; gap:10px;">
-      <div class="user-pill">
-        <img id="myAvatar" src="" alt="">
-        <span class="user-pill-name" id="myName"></span>
-      </div>
-      <button class="btn-logout" id="logoutBtn">Выйти</button>
-    </div>
+  <div id="loadingScreen">Загрузка…</div>
+
+  <!-- Экран входа -->
+  <div class="glass" id="loginScreen">
+    <div class="login-icon">👁️</div>
+    <div class="login-title">Войдите в систему</div>
+    <p class="login-desc">Войдите через Google, чтобы видеть и обновлять статусы в реальном времени</p>
+    <button class="btn-google" onclick="loginWithGoogle()">
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.8-1.9 13.3-5.1l-6.2-5.2C29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C37 36.9 44 31 44 24c0-1.3-.1-2.7-.4-3.9z"/>
+      </svg>
+      Войти через Google
+    </button>
   </div>
 
-  <!-- LOGIN -->
-  <div id="loginScreen">
-    <div class="login-card">
-      <h2>Private <span>Chat</span></h2>
-      <p>// войдите чтобы начать переписку</p>
-      <button class="btn-google" id="loginBtn">
-        <svg class="g-icon" viewBox="0 0 24 24">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Войти через Google
-      </button>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="chatScreen">
-    <div class="chat-body">
-
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <div class="sidebar-header">// собеседники</div>
-        <div class="users-list" id="usersList"></div>
-      </div>
-
-      <!-- Panel -->
-      <div class="chat-panel">
-        <div class="chat-empty" id="chatEmpty">
-          <div class="chat-empty-icon">💬</div>
-          <div>// выберите собеседника</div>
-        </div>
-
-        <div class="active-chat" id="activeChat">
-          <div class="chat-header">
-            <img class="chat-header-avatar" id="chatAvatar" src="" alt="">
-            <div>
-              <div class="chat-header-name" id="chatName"></div>
-              <div class="chat-header-status">// в сети</div>
-            </div>
-          </div>
-          <div class="messages" id="messages"></div>
-          <div class="input-area">
-            <div class="input-wrap">
-              <div class="attach-strip" id="attachStrip">
-                <img class="attach-thumb" id="attachThumb" src="" alt="">
-                <span class="attach-name" id="attachName"></span>
-                <button class="attach-remove" id="attachRemove" type="button">✕</button>
-              </div>
-              <textarea class="msg-input" id="msgInput" placeholder="Ваше сообщение..." rows="1"></textarea>
-            </div>
-            <div class="input-actions">
-              <button class="btn-attach" id="btnAttach" title="Прикрепить фото">🖼</button>
-              <button class="btn-send" id="btnSend">➤</button>
-            </div>
-            <input type="file" id="fileInput" accept="image/*">
-          </div>
+  <!-- Основной экран -->
+  <div id="appScreen">
+    <div class="glass my-card">
+      <div class="section-label">Мой статус</div>
+      <div class="status-row">
+        <div class="avatar" id="myAvatar">?</div>
+        <div class="user-info">
+          <div class="username" id="myUsername">…</div>
+          <div class="user-email" id="myEmail"></div>
+          <span class="status-badge badge-offline" id="myBadge">
+            <span class="dot"></span>Оффлайн
+          </span>
         </div>
       </div>
+      <div class="btn-group">
+        <button class="btn" onclick="setStatus('online')">🟢 Онлайн</button>
+        <button class="btn" onclick="setStatus('away')">🟡 Отошёл</button>
+        <button class="btn" onclick="setStatus('busy')">🔴 Занят</button>
+        <button class="btn" onclick="setStatus('offline')">⚪ Оффлайн</button>
+      </div>
+      <div><button class="btn-logout" onclick="logout()">Выйти из аккаунта</button></div>
+    </div>
 
+    <div class="glass list-card">
+      <div class="section-label">Все пользователи</div>
+      <ul class="user-list" id="userList">
+        <li class="loader">Загрузка…</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <span class="realtime-dot"></span> Realtime sync включён
     </div>
   </div>
 
-</div>
+<script>
+  const SUPABASE_URL = 'https://vwjuqdgumxhjbkowepfx.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3anVxZGd1bXhoamJrb3dlcGZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzEyMjQsImV4cCI6MjA5MTIwNzIyNH0.DO7WAaPhGIGr0AtwOuuV0lketGjyyOqWSZw5dzWf59k';
 
-<div id="lightbox" onclick="document.getElementById('lightbox').classList.remove('open')">
-  <img id="lightboxImg" src="" alt="">
-</div>
-<div id="toast"></div>
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import {
-    getFirestore, collection, doc, addDoc, setDoc,
-    query, orderBy, onSnapshot, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-  import {
-    getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  let currentUser = null;
 
-  const app = initializeApp({
-    apiKey: "AIzaSyBK0Bq-hvxwqrYeX-ThgbatMsjnFXxsld8",
-    authDomain: "jeffrey-epstein-ed456.firebaseapp.com",
-    projectId: "jeffrey-epstein-ed456",
-    storageBucket: "jeffrey-epstein-ed456.firebasestorage.app",
-    messagingSenderId: "312094362251",
-    appId: "1:312094362251:web:c44b2d36dcbc7c3adb228e"
-  });
-
-  const db       = getFirestore(app);
-  const auth     = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  let me           = null;   // текущий пользователь
-  let activePeer   = null;   // выбранный собеседник { uid, name, photo }
-  let unsubMsgs    = null;   // отписка от listener сообщений
-  let unsubUsers   = null;   // отписка от listener пользователей
-  let usersCache   = {};     // uid -> данные пользователя
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  function esc(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function initials(name) {
+    if (!name) return '?';
+    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
-  function chatId(a, b) { return [a, b].sort().join('_'); }
-  function toast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+
+  function badgeClass(s) {
+    return { online: 'badge-online', away: 'badge-away', busy: 'badge-busy' }[s] || 'badge-offline';
   }
-  function show(id, v) { document.getElementById(id).style.display = v; }
 
-  // ── Auth ───────────────────────────────────────────────────────────────────
-  document.getElementById('loginBtn').onclick  = () => signInWithPopup(auth, provider).catch(() => {});
-  document.getElementById('logoutBtn').onclick = () => signOut(auth);
+  function labelText(s) {
+    return { online: 'Онлайн', away: 'Отошёл', busy: 'Занят', offline: 'Оффлайн' }[s] || 'Оффлайн';
+  }
 
-  onAuthStateChanged(auth, async user => {
-    me = user;
-    if (user) {
-      // Сохраняем профиль в Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        uid:   user.uid,
-        name:  user.displayName || '',
-        photo: user.photoURL    || '',
-        email: user.email       || '',
-        lastSeen: serverTimestamp()
-      }, { merge: true });
+  function btnActiveClass(s) {
+    return { online: 'active-online', away: 'active-away', busy: 'active-busy', offline: 'active-offline' }[s] || '';
+  }
 
-      show('loginScreen',  'none');
-      show('chatScreen',   'flex');
-      show('topbarUser',   'flex');
-      document.getElementById('myAvatar').src      = user.photoURL || '';
-      document.getElementById('myName').innerText  = user.displayName || user.email;
-      startListeningUsers();
+  async function loginWithGoogle() {
+    await db.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.href }
+    });
+  }
+
+  async function logout() {
+    if (currentUser) {
+      await db.from('profiles').update({ status: 'offline' }).eq('id', currentUser.id);
+    }
+    await db.auth.signOut();
+  }
+
+  async function ensureProfile(user) {
+    const meta = user.user_metadata || {};
+    const username = meta.full_name || meta.name || user.email?.split('@')[0] || 'User';
+    const avatar_url = meta.avatar_url || meta.picture || null;
+    await db.from('profiles').upsert(
+      { id: user.id, username, avatar_url, status: 'online' },
+      { onConflict: 'id' }
+    );
+  }
+
+  function renderMyCard(profile) {
+    const el = document.getElementById('myAvatar');
+    if (profile.avatar_url) {
+      el.innerHTML = '<img src="' + profile.avatar_url + '" alt="">';
     } else {
-      show('loginScreen', 'flex');
-      show('chatScreen',  'none');
-      show('topbarUser',  'none');
-      if (unsubMsgs)  { unsubMsgs();  unsubMsgs  = null; }
-      if (unsubUsers) { unsubUsers(); unsubUsers = null; }
-      activePeer = null;
+      el.textContent = initials(profile.username);
     }
-  });
+    document.getElementById('myUsername').textContent = profile.username || 'Без имени';
+    document.getElementById('myEmail').textContent = currentUser?.email || '';
 
-  // ── Список пользователей ───────────────────────────────────────────────────
-  function startListeningUsers() {
-    if (unsubUsers) unsubUsers();
-    unsubUsers = onSnapshot(collection(db, 'users'), snap => {
-      usersCache = {};
-      snap.docs.forEach(d => { usersCache[d.id] = d.data(); });
-      renderUsersList();
+    const badge = document.getElementById('myBadge');
+    badge.className = 'status-badge ' + badgeClass(profile.status);
+    badge.innerHTML = '<span class="dot"></span>' + labelText(profile.status);
+
+    const keys = ['online', 'away', 'busy', 'offline'];
+    document.querySelectorAll('.btn-group .btn').forEach((b, i) => {
+      b.className = 'btn';
+      if (keys[i] === (profile.status || 'offline')) b.classList.add(btnActiveClass(profile.status));
     });
   }
 
-  function renderUsersList() {
-    const list  = document.getElementById('usersList');
-    const peers = Object.values(usersCache).filter(u => u.uid !== me?.uid);
+  function renderList(profiles) {
+    const ul = document.getElementById('userList');
+    if (!profiles.length) { ul.innerHTML = '<li class="loader">Нет пользователей</li>'; return; }
+    ul.innerHTML = profiles.map(p => {
+      const av = p.avatar_url
+        ? '<img src="' + p.avatar_url + '" alt="">'
+        : initials(p.username);
+      return '<li class="user-item">' +
+        '<div class="av-sm">' + av + '</div>' +
+        '<span class="item-name">' + (p.username || 'Без имени') + '</span>' +
+        '<span class="status-badge ' + badgeClass(p.status) + '">' +
+        '<span class="dot"></span>' + labelText(p.status) +
+        '</span></li>';
+    }).join('');
+  }
 
-    if (!peers.length) {
-      list.innerHTML = '<div style="padding:20px 10px;font-family:\'IBM Plex Mono\',monospace;font-size:11px;color:var(--muted);">// пока никого нет</div>';
-      return;
+  async function loadAll() {
+    const { data, error } = await db.from('profiles').select('*');
+    if (error) { console.error(error); return; }
+    renderList(data || []);
+    if (currentUser) {
+      const me = (data || []).find(p => p.id === currentUser.id);
+      if (me) renderMyCard(me);
     }
-
-    list.innerHTML = '';
-    peers.forEach(u => {
-      const el = document.createElement('div');
-      el.className = 'user-item' + (activePeer?.uid === u.uid ? ' active' : '');
-      el.innerHTML = `
-        <img class="user-item-avatar"
-             src="${esc(u.photo || 'https://via.placeholder.com/36')}"
-             alt=""
-             onerror="this.src='https://via.placeholder.com/36'">
-        <div class="user-item-info">
-          <div class="user-item-name">${esc(u.name || u.email)}</div>
-          <div class="user-item-preview">${esc(u.email || '')}</div>
-        </div>`;
-      // ключевое место: передаём uid через closure, не через HTML-атрибут
-      el.addEventListener('click', () => openChat(u.uid));
-      list.appendChild(el);
-    });
   }
 
-  // ── Открыть чат ───────────────────────────────────────────────────────────
-  function openChat(uid) {
-    const u = usersCache[uid];
-    if (!u) return;
-
-    activePeer = u;
-    renderUsersList(); // обновить подсветку active
-
-    document.getElementById('chatEmpty').style.display  = 'none';
-    document.getElementById('activeChat').style.display = 'flex';
-    document.getElementById('chatName').innerText        = u.name || u.email;
-    document.getElementById('chatAvatar').src            = u.photo || 'https://via.placeholder.com/36';
-
-    listenMessages();
+  async function setStatus(status) {
+    if (!currentUser) return;
+    await db.from('profiles').update({ status }).eq('id', currentUser.id);
   }
 
-  // ── Сообщения ─────────────────────────────────────────────────────────────
-  function listenMessages() {
-    if (unsubMsgs) unsubMsgs();
-
-    const cid = chatId(me.uid, activePeer.uid);
-    const q   = query(collection(db, 'chats', cid, 'messages'), orderBy('timestamp', 'asc'));
-
-    unsubMsgs = onSnapshot(q, snap => {
-      const box = document.getElementById('messages');
-      let lastDate = '';
-      let html = '';
-
-      snap.docs.forEach(d => {
-        const m      = d.data();
-        const isOut  = m.senderUid === me.uid;
-        const date   = m.timestamp?.toDate();
-        const ds     = date ? date.toLocaleDateString('ru', { day:'numeric', month:'long' }) : '';
-        const ts     = date ? date.toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' }) : '...';
-
-        if (ds && ds !== lastDate) {
-          lastDate = ds;
-          html += `<div class="date-divider">${ds}</div>`;
-        }
-
-        const imgHtml  = m.image ? `<img class="msg-img" src="${m.image}" alt="photo">` : '';
-        const textHtml = m.text  ? `<span>${esc(m.text)}</span>` : '';
-
-        html += `
-          <div class="msg ${isOut ? 'out' : 'in'}">
-            <div class="msg-bubble">${textHtml}${imgHtml}</div>
-            <div class="msg-time">${ts}</div>
-          </div>`;
-      });
-
-      box.innerHTML = html;
-
-      // Клики на картинки в сообщениях
-      box.querySelectorAll('.msg-img').forEach(img => {
-        img.addEventListener('click', () => {
-          document.getElementById('lightboxImg').src = img.src;
-          document.getElementById('lightbox').classList.add('open');
-        });
-      });
-
-      box.scrollTop = box.scrollHeight;
-    });
+  function showLoading() {
+    document.getElementById('loadingScreen').style.display = 'block';
+    document.getElementById('loginScreen').style.display  = 'none';
+    document.getElementById('appScreen').style.display    = 'none';
   }
 
-  // ── Прикрепление картинки ─────────────────────────────────────────────────
-  const MAX_BYTES = 256 * 1024;
-  let pendingImage = null;
+  function showLogin() {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display  = 'block';
+    document.getElementById('appScreen').style.display    = 'none';
+  }
 
-  document.getElementById('btnAttach').addEventListener('click', () => {
-    document.getElementById('fileInput').click();
-  });
+  function showApp() {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display  = 'none';
+    document.getElementById('appScreen').style.display    = 'block';
+  }
 
-  document.getElementById('fileInput').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > MAX_BYTES) {
-      toast('✗ Файл слишком большой (макс. 256 КБ)');
-      e.target.value = '';
-      return;
+  db.channel('profiles-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, loadAll)
+    .subscribe();
+
+  db.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      await ensureProfile(currentUser);
+      showApp();
+      loadAll();
+    } else {
+      currentUser = null;
+      showLogin();
     }
-    const reader = new FileReader();
-    reader.onload = ev => {
-      pendingImage = ev.target.result;
-      document.getElementById('attachThumb').src      = pendingImage;
-      document.getElementById('attachName').innerText = file.name;
-      document.getElementById('attachStrip').classList.add('visible');
-    };
-    reader.readAsDataURL(file);
   });
 
-  document.getElementById('attachRemove').addEventListener('click', clearAttach);
-  function clearAttach() {
-    pendingImage = null;
-    document.getElementById('fileInput').value = '';
-    document.getElementById('attachStrip').classList.remove('visible');
-    document.getElementById('attachThumb').src = '';
-  }
-
-  // ── Отправка ───────────────────────────────────────────────────────────────
-  document.getElementById('btnSend').addEventListener('click', sendMessage);
-  document.getElementById('msgInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  });
-  document.getElementById('msgInput').addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-  });
-
-  async function sendMessage() {
-    if (!activePeer || !me) return;
-    const input = document.getElementById('msgInput');
-    const text  = input.value.trim();
-    if (!text && !pendingImage) return;
-
-    const btn = document.getElementById('btnSend');
-    btn.disabled = true;
-    try {
-      const cid     = chatId(me.uid, activePeer.uid);
-      const payload = {
-        senderUid:   me.uid,
-        senderName:  me.displayName || '',
-        senderPhoto: me.photoURL    || '',
-        text:        text,
-        timestamp:   serverTimestamp()
-      };
-      if (pendingImage) payload.image = pendingImage;
-
-      await addDoc(collection(db, 'chats', cid, 'messages'), payload);
-      input.value = '';
-      input.style.height = 'auto';
-      clearAttach();
-    } catch (e) {
-      toast('✗ Ошибка: ' + e.message);
-      console.error(e);
-    }
-    btn.disabled = false;
-  }
+  showLoading();
 </script>
 </body>
 </html>
