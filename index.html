@@ -292,10 +292,16 @@
     const meta = user.user_metadata || {};
     const username = meta.full_name || meta.name || user.email?.split('@')[0] || 'User';
     const avatar_url = meta.avatar_url || meta.picture || null;
-    await db.from('profiles').upsert(
-      { id: user.id, username, avatar_url, status: 'online' },
-      { onConflict: 'id' }
-    );
+
+    const { data: existing } = await db.from('profiles').select('id').eq('id', user.id).single();
+
+    if (existing) {
+      await db.from('profiles').update({ username, avatar_url, status: 'online' }).eq('id', user.id);
+    } else {
+      const payload = { id: user.id, username, status: 'online' };
+      if (avatar_url) payload.avatar_url = avatar_url;
+      await db.from('profiles').insert(payload);
+    }
   }
 
   function renderMyCard(profile) {
