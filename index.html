@@ -15,62 +15,35 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
+      padding: 40px 20px 80px;
       color: #fff;
     }
 
     h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px;
       background: linear-gradient(90deg, #fff 60%, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-
-    .subtitle {
-      color: rgba(255,255,255,0.5);
-      font-size: 0.9rem;
-      margin-bottom: 36px;
-    }
+    .subtitle { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-bottom: 36px; }
 
     .glass {
       background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 20px;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 20px;
     }
 
     /* LOGIN */
-    #loginScreen {
-      width: 100%;
-      max-width: 400px;
-      padding: 40px 36px;
-      text-align: center;
-      display: none;
-    }
+    #loginScreen { width: 100%; max-width: 400px; padding: 40px 36px; text-align: center; display: none; }
     .login-icon { font-size: 2.5rem; margin-bottom: 16px; }
     .login-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
     .login-desc { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 32px; line-height: 1.6; }
 
     .btn-google {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      padding: 13px 20px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      width: 100%; padding: 13px 20px; border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1);
+      color: #fff; font-size: 0.95rem; font-weight: 500; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
     }
     .btn-google:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); transform: translateY(-1px); }
     .btn-google:active { transform: scale(0.98); }
@@ -78,33 +51,27 @@
     /* APP */
     #appScreen { display: none; width: 100%; max-width: 480px; }
 
-    .my-card { padding: 28px 32px; margin-bottom: 32px; }
+    .card { padding: 24px 28px; margin-bottom: 20px; }
+    .card.my-card { padding: 28px 32px; }
 
     .section-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 16px;
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.4); margin-bottom: 16px;
     }
 
+    /* My status */
     .status-row { display: flex; align-items: center; gap: 12px; }
-
     .avatar {
-      width: 48px; height: 48px;
-      border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, #7c3aed, #3b82f6);
       display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 1.05rem;
-      flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,0.25);
-      overflow: hidden;
+      font-weight: 700; font-size: 1.05rem; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.25); overflow: hidden;
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
-
     .user-info { flex: 1; min-width: 0; }
     .username { font-weight: 600; font-size: 1rem; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .user-email { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-email { font-size: 0.73rem; color: rgba(255,255,255,0.4); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .status-badge {
       display: inline-flex; align-items: center; gap: 6px;
@@ -113,8 +80,8 @@
     .dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(0.85); }
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.6; transform:scale(0.85); }
     }
 
     .badge-online  { background: rgba(7,202,107,0.2);  color: #07CA6B; }
@@ -126,12 +93,22 @@
     .badge-offline { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
     .badge-offline .dot { background: rgba(255,255,255,0.4); animation: none; }
 
-    .btn-group { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    /* Study timer on my card */
+    .my-study-time {
+      margin-top: 14px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 12px;
+      background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+    }
+    .my-study-time .timer-icon { font-size: 1.1rem; }
+    .my-study-time .timer-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+    .my-study-time .timer-val { font-size: 1.1rem; font-weight: 700; color: #a78bfa; letter-spacing: 1px; }
+
+    .btn-group { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 
     .btn {
       padding: 8px 16px; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.07);
       color: #fff; font-size: 0.82rem; font-weight: 500;
       cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
@@ -143,26 +120,22 @@
     .btn.active-offline { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.5); }
 
     .btn-logout {
-      margin-top: 16px;
-      padding: 7px 16px; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: transparent;
+      margin-top: 14px; padding: 7px 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12); background: transparent;
       color: rgba(255,255,255,0.35); font-size: 0.78rem;
       cursor: pointer; transition: all 0.2s; font-family: inherit;
     }
     .btn-logout:hover { color: #EA2143; border-color: rgba(234,33,67,0.4); }
 
-    .list-card { padding: 24px 28px; }
-    .user-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-
+    /* Users list */
+    .user-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .user-item {
       display: flex; align-items: center; gap: 12px;
-      padding: 12px 16px; border-radius: 14px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 14px; border-radius: 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
       transition: background 0.2s;
     }
-    .user-item:hover { background: rgba(255,255,255,0.1); }
+    .user-item:hover { background: rgba(255,255,255,0.09); }
 
     .av-sm {
       width: 38px; height: 38px; border-radius: 50%;
@@ -172,22 +145,93 @@
     }
     .av-sm img { width: 100%; height: 100%; object-fit: cover; }
 
-    .item-name { font-weight: 500; font-size: 0.9rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name { font-weight: 500; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item-time { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+    /* CHAT */
+    .chat-card { padding: 0; overflow: hidden; }
+    .chat-header { padding: 18px 24px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+    .chat-messages {
+      height: 260px; overflow-y: auto; padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+      scroll-behavior: smooth;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+    .msg {
+      display: flex; gap: 10px; align-items: flex-start;
+      animation: fadeIn 0.2s ease;
+    }
+    .msg.mine { flex-direction: row-reverse; }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    .msg-av {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 600; flex-shrink: 0; overflow: hidden;
+    }
+    .msg-av img { width: 100%; height: 100%; object-fit: cover; }
+
+    .msg-body { max-width: 75%; }
+    .msg-name { font-size: 0.7rem; color: rgba(255,255,255,0.45); margin-bottom: 3px; }
+    .msg.mine .msg-name { text-align: right; }
+
+    .msg-bubble {
+      padding: 8px 13px; border-radius: 16px;
+      font-size: 0.88rem; line-height: 1.45;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+      word-break: break-word;
+    }
+    .msg.mine .msg-bubble {
+      background: rgba(99,102,241,0.35); border-color: rgba(99,102,241,0.4);
+    }
+
+    .msg-time { font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 3px; }
+    .msg.mine .msg-time { text-align: right; }
+
+    .chat-input-row {
+      display: flex; gap: 10px; padding: 14px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      align-items: center;
+    }
+    .chat-input {
+      flex: 1; padding: 10px 16px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+      color: #fff; font-size: 0.88rem; font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+    .chat-input:focus { border-color: rgba(99,102,241,0.6); }
+
+    .chat-send {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s, opacity 0.15s; color: #fff;
+    }
+    .chat-send:hover { transform: scale(1.08); }
+    .chat-send:active { transform: scale(0.95); }
+    .chat-send:disabled { opacity: 0.4; cursor: default; transform: none; }
 
     .loader { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 0.85rem; }
 
     .footer {
       margin-top: 24px; font-size: 0.75rem;
-      color: rgba(255,255,255,0.3);
-      display: flex; align-items: center;
+      color: rgba(255,255,255,0.3); display: flex; align-items: center;
     }
     .realtime-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #07CA6B; display: inline-block;
-      margin-right: 6px; animation: pulse 2s infinite;
+      width: 8px; height: 8px; border-radius: 50%; background: #07CA6B;
+      display: inline-block; margin-right: 6px; animation: pulse 2s infinite;
     }
 
     #loadingScreen { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-top: 60px; }
+
+    .chat-empty { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.3); font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -197,7 +241,6 @@
 
   <div id="loadingScreen">Загрузка…</div>
 
-  <!-- Экран входа -->
   <div class="glass" id="loginScreen">
     <div class="login-icon">👁️</div>
     <div class="login-title">Войдите в систему</div>
@@ -213,9 +256,10 @@
     </button>
   </div>
 
-  <!-- Основной экран -->
   <div id="appScreen">
-    <div class="glass my-card">
+
+    <!-- Моя карточка -->
+    <div class="glass card my-card">
       <div class="section-label">Мой статус</div>
       <div class="status-row">
         <div class="avatar" id="myAvatar">?</div>
@@ -227,6 +271,16 @@
           </span>
         </div>
       </div>
+
+      <!-- Мой таймер учёбы -->
+      <div class="my-study-time">
+        <span class="timer-icon">⏱️</span>
+        <div>
+          <div class="timer-label">Время в учёбе сегодня</div>
+          <div class="timer-val" id="myStudyTimer">0ч 0м 0с</div>
+        </div>
+      </div>
+
       <div class="btn-group">
         <button class="btn" onclick="setStatus('online')">🟢 Онлайн</button>
         <button class="btn" onclick="setStatus('away')">🟡 Отошёл</button>
@@ -236,14 +290,35 @@
       <div><button class="btn-logout" onclick="logout()">Выйти из аккаунта</button></div>
     </div>
 
-    <div class="glass list-card">
+    <!-- Список пользователей -->
+    <div class="glass card">
       <div class="section-label">Все пользователи</div>
       <ul class="user-list" id="userList">
         <li class="loader">Загрузка…</li>
       </ul>
     </div>
 
-    <div class="footer">
+    <!-- Общий чат -->
+    <div class="glass chat-card">
+      <div class="chat-header">
+        <div class="section-label" style="margin-bottom:0">💬 Общий чат</div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-empty">Нет сообщений. Напишите первым!</div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" placeholder="Сообщение…" maxlength="500"
+          onkeydown="if(event.key==='Enter')sendMessage()"/>
+        <button class="chat-send" onclick="sendMessage()" id="chatSendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="footer" style="margin-top:20px">
       <span class="realtime-dot"></span> Realtime sync включён
     </div>
   </div>
@@ -256,24 +331,70 @@
   const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let currentUser = null;
+  let studySeconds = 0;       // локальный счётчик (только online)
+  let studyInterval = null;   // setInterval id
+  let currentStatus = 'offline';
 
+  // ── helpers ──────────────────────────────────────────────
   function initials(name) {
     if (!name) return '?';
     return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
-
   function badgeClass(s) {
-    return { online: 'badge-online', away: 'badge-away', busy: 'badge-busy' }[s] || 'badge-offline';
+    return { online:'badge-online', away:'badge-away', busy:'badge-busy' }[s] || 'badge-offline';
   }
-
   function labelText(s) {
-    return { online: 'Онлайн', away: 'Отошёл', busy: 'Занят', offline: 'Оффлайн' }[s] || 'Оффлайн';
+    return { online:'Онлайн', away:'Отошёл', busy:'Занят', offline:'Оффлайн' }[s] || 'Оффлайн';
   }
-
   function btnActiveClass(s) {
-    return { online: 'active-online', away: 'active-away', busy: 'active-busy', offline: 'active-offline' }[s] || '';
+    return { online:'active-online', away:'active-away', busy:'active-busy', offline:'active-offline' }[s] || '';
+  }
+  function fmtTime(secs) {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return h + 'ч ' + m + 'м ' + s + 'с';
+  }
+  function fmtTimeShort(secs) {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    if (h > 0) return h + 'ч ' + m + 'м';
+    if (m > 0) return m + 'м';
+    return secs + 'с';
+  }
+  function timeAgo(iso) {
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d) / 1000);
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return Math.floor(diff/60) + ' мин назад';
+    return d.toLocaleTimeString('ru', {hour:'2-digit', minute:'2-digit'});
   }
 
+  // ── study timer ───────────────────────────────────────────
+  function startStudyTimer() {
+    if (studyInterval) return;
+    studyInterval = setInterval(async () => {
+      studySeconds++;
+      document.getElementById('myStudyTimer').textContent = fmtTime(studySeconds);
+      // каждые 30 сек сохраняем в БД
+      if (studySeconds % 30 === 0 && currentUser) {
+        await db.from('profiles').update({ study_seconds: studySeconds }).eq('id', currentUser.id);
+      }
+    }, 1000);
+  }
+
+  function stopStudyTimer() {
+    if (studyInterval) {
+      clearInterval(studyInterval);
+      studyInterval = null;
+    }
+    // сохраняем при остановке
+    if (currentUser && studySeconds > 0) {
+      db.from('profiles').update({ study_seconds: studySeconds }).eq('id', currentUser.id);
+    }
+  }
+
+  // ── auth ─────────────────────────────────────────────────
   async function loginWithGoogle() {
     await db.auth.signInWithOAuth({
       provider: 'google',
@@ -282,8 +403,9 @@
   }
 
   async function logout() {
+    stopStudyTimer();
     if (currentUser) {
-      await db.from('profiles').update({ status: 'offline' }).eq('id', currentUser.id);
+      await db.from('profiles').update({ status: 'offline', study_seconds: studySeconds }).eq('id', currentUser.id);
     }
     await db.auth.signOut();
   }
@@ -293,24 +415,22 @@
     const username = meta.full_name || meta.name || user.email?.split('@')[0] || 'User';
     const avatar_url = meta.avatar_url || meta.picture || null;
 
-    const { data: existing } = await db.from('profiles').select('id').eq('id', user.id).single();
-
+    const { data: existing } = await db.from('profiles').select('id, study_seconds').eq('id', user.id).single();
     if (existing) {
+      studySeconds = existing.study_seconds || 0;
+      document.getElementById('myStudyTimer').textContent = fmtTime(studySeconds);
       await db.from('profiles').update({ username, avatar_url, status: 'online' }).eq('id', user.id);
     } else {
-      const payload = { id: user.id, username, status: 'online' };
+      const payload = { id: user.id, username, status: 'online', study_seconds: 0 };
       if (avatar_url) payload.avatar_url = avatar_url;
       await db.from('profiles').insert(payload);
     }
   }
 
+  // ── render my card ────────────────────────────────────────
   function renderMyCard(profile) {
     const el = document.getElementById('myAvatar');
-    if (profile.avatar_url) {
-      el.innerHTML = '<img src="' + profile.avatar_url + '" alt="">';
-    } else {
-      el.textContent = initials(profile.username);
-    }
+    el.innerHTML = profile.avatar_url ? '<img src="' + profile.avatar_url + '" alt="">' : initials(profile.username);
     document.getElementById('myUsername').textContent = profile.username || 'Без имени';
     document.getElementById('myEmail').textContent = currentUser?.email || '';
 
@@ -318,25 +438,36 @@
     badge.className = 'status-badge ' + badgeClass(profile.status);
     badge.innerHTML = '<span class="dot"></span>' + labelText(profile.status);
 
-    const keys = ['online', 'away', 'busy', 'offline'];
-    document.querySelectorAll('.btn-group .btn').forEach((b, i) => {
+    const keys = ['online','away','busy','offline'];
+    document.querySelectorAll('.btn-group .btn').forEach((b,i) => {
       b.className = 'btn';
-      if (keys[i] === (profile.status || 'offline')) b.classList.add(btnActiveClass(profile.status));
+      if (keys[i] === (profile.status||'offline')) b.classList.add(btnActiveClass(profile.status));
     });
+
+    // управляем таймером
+    if (profile.status === 'online' && currentStatus !== 'online') {
+      startStudyTimer();
+    } else if (profile.status !== 'online' && currentStatus === 'online') {
+      stopStudyTimer();
+    }
+    currentStatus = profile.status || 'offline';
   }
 
+  // ── render users list ─────────────────────────────────────
   function renderList(profiles) {
     const ul = document.getElementById('userList');
     if (!profiles.length) { ul.innerHTML = '<li class="loader">Нет пользователей</li>'; return; }
     ul.innerHTML = profiles.map(p => {
-      const av = p.avatar_url
-        ? '<img src="' + p.avatar_url + '" alt="">'
-        : initials(p.username);
+      const av = p.avatar_url ? '<img src="' + p.avatar_url + '" alt="">' : initials(p.username);
+      const studyStr = p.study_seconds > 0 ? '⏱ ' + fmtTimeShort(p.study_seconds) : '';
       return '<li class="user-item">' +
         '<div class="av-sm">' + av + '</div>' +
-        '<span class="item-name">' + (p.username || 'Без имени') + '</span>' +
+        '<div class="item-info">' +
+          '<div class="item-name">' + (p.username||'Без имени') + '</div>' +
+          (studyStr ? '<div class="item-time">' + studyStr + ' в учёбе</div>' : '') +
+        '</div>' +
         '<span class="status-badge ' + badgeClass(p.status) + '">' +
-        '<span class="dot"></span>' + labelText(p.status) +
+          '<span class="dot"></span>' + labelText(p.status) +
         '</span></li>';
     }).join('');
   }
@@ -346,7 +477,7 @@
     if (error) { console.error(error); return; }
     renderList(data || []);
     if (currentUser) {
-      const me = (data || []).find(p => p.id === currentUser.id);
+      const me = (data||[]).find(p => p.id === currentUser.id);
       if (me) renderMyCard(me);
     }
   }
@@ -356,41 +487,111 @@
     await db.from('profiles').update({ status }).eq('id', currentUser.id);
   }
 
+  // ── CHAT ─────────────────────────────────────────────────
+  let chatMessages = [];
+
+  async function loadMessages() {
+    const { data, error } = await db.from('messages')
+      .select('*').order('created_at', { ascending: true }).limit(100);
+    if (error) { console.error('chat load:', error); return; }
+    chatMessages = data || [];
+    renderMessages();
+  }
+
+  function renderMessages() {
+    const box = document.getElementById('chatMessages');
+    if (!chatMessages.length) {
+      box.innerHTML = '<div class="chat-empty">Нет сообщений. Напишите первым!</div>';
+      return;
+    }
+    box.innerHTML = chatMessages.map(m => {
+      const mine = currentUser && m.user_id === currentUser.id;
+      const av = m.avatar_url ? '<img src="' + m.avatar_url + '" alt="">' : initials(m.username);
+      return '<div class="msg' + (mine ? ' mine' : '') + '">' +
+        '<div class="msg-av">' + av + '</div>' +
+        '<div class="msg-body">' +
+          '<div class="msg-name">' + (m.username||'?') + '</div>' +
+          '<div class="msg-bubble">' + escHtml(m.text) + '</div>' +
+          '<div class="msg-time">' + timeAgo(m.created_at) + '</div>' +
+        '</div></div>';
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function sendMessage() {
+    if (!currentUser) return;
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const btn = document.getElementById('chatSendBtn');
+    btn.disabled = true;
+    input.value = '';
+
+    const meta = currentUser.user_metadata || {};
+    const { error } = await db.from('messages').insert({
+      user_id: currentUser.id,
+      username: meta.full_name || meta.name || currentUser.email?.split('@')[0] || 'User',
+      avatar_url: meta.avatar_url || meta.picture || null,
+      text
+    });
+    if (error) { console.error('send error:', error); input.value = text; }
+    btn.disabled = false;
+    input.focus();
+  }
+
+  // ── screens ───────────────────────────────────────────────
   function showLoading() {
     document.getElementById('loadingScreen').style.display = 'block';
     document.getElementById('loginScreen').style.display  = 'none';
     document.getElementById('appScreen').style.display    = 'none';
   }
-
   function showLogin() {
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('loginScreen').style.display  = 'block';
     document.getElementById('appScreen').style.display    = 'none';
   }
-
   function showApp() {
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('loginScreen').style.display  = 'none';
     document.getElementById('appScreen').style.display    = 'block';
   }
 
+  // ── realtime ──────────────────────────────────────────────
   db.channel('profiles-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, loadAll)
+    .on('postgres_changes', { event:'*', schema:'public', table:'profiles' }, loadAll)
     .subscribe();
 
+  db.channel('messages-changes')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages' }, payload => {
+      chatMessages.push(payload.new);
+      renderMessages();
+    })
+    .subscribe();
+
+  // ── auth ─────────────────────────────────────────────────
   db.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
       currentUser = session.user;
       const meta = currentUser.user_metadata || {};
       renderMyCard({
-        username: meta.full_name || meta.name || currentUser.email?.split("@")[0] || "User",
+        username: meta.full_name || meta.name || currentUser.email?.split('@')[0] || 'User',
         avatar_url: meta.avatar_url || meta.picture || null,
-        status: "online"
+        status: 'online'
       });
       showApp();
-      ensureProfile(currentUser).then(() => loadAll()).catch(console.error);
+      ensureProfile(currentUser).then(() => {
+        loadAll();
+        loadMessages();
+        startStudyTimer();
+      }).catch(console.error);
     } else {
       currentUser = null;
+      stopStudyTimer();
       showLogin();
     }
   });
