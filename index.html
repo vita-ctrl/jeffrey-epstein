@@ -104,20 +104,7 @@
     .my-study-time .timer-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
     .my-study-time .timer-val { font-size: 1.1rem; font-weight: 700; color: #a78bfa; letter-spacing: 1px; }
 
-    .btn-group { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 
-    .btn {
-      padding: 8px 16px; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.07);
-      color: #fff; font-size: 0.82rem; font-weight: 500;
-      cursor: pointer; transition: all 0.2s; font-family: inherit;
-    }
-    .btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
-    .btn:active { transform: scale(0.97); }
-    .btn.active-online  { background: rgba(7,202,107,0.25);  border-color: #07CA6B; color: #07CA6B; }
-    .btn.active-away    { background: rgba(232,149,88,0.25); border-color: #E89558; color: #E89558; }
-    .btn.active-busy    { background: rgba(234,33,67,0.25);  border-color: #EA2143; color: #EA2143; }
-    .btn.active-offline { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.5); }
 
     .btn-logout {
       margin-top: 14px; padding: 7px 16px; border-radius: 999px;
@@ -280,13 +267,6 @@
           <div class="timer-val" id="myStudyTimer">0ч 0м 0с</div>
         </div>
       </div>
-
-      <div class="btn-group">
-        <button class="btn" onclick="setStatus('online')">🟢 Онлайн</button>
-        <button class="btn" onclick="setStatus('away')">🟡 Отошёл</button>
-        <button class="btn" onclick="setStatus('busy')">🔴 Занят</button>
-        <button class="btn" onclick="setStatus('offline')">⚪ Оффлайн</button>
-      </div>
       <div><button class="btn-logout" onclick="logout()">Выйти из аккаунта</button></div>
     </div>
 
@@ -345,9 +325,6 @@
   }
   function labelText(s) {
     return { online:'Онлайн', away:'Отошёл', busy:'Занят', offline:'Оффлайн' }[s] || 'Оффлайн';
-  }
-  function btnActiveClass(s) {
-    return { online:'active-online', away:'active-away', busy:'active-busy', offline:'active-offline' }[s] || '';
   }
   function fmtTime(secs) {
     const h = Math.floor(secs / 3600);
@@ -438,12 +415,6 @@
     badge.className = 'status-badge ' + badgeClass(profile.status);
     badge.innerHTML = '<span class="dot"></span>' + labelText(profile.status);
 
-    const keys = ['online','away','busy','offline'];
-    document.querySelectorAll('.btn-group .btn').forEach((b,i) => {
-      b.className = 'btn';
-      if (keys[i] === (profile.status||'offline')) b.classList.add(btnActiveClass(profile.status));
-    });
-
     // управляем таймером
     if (profile.status === 'online' && currentStatus !== 'online') {
       startStudyTimer();
@@ -482,10 +453,6 @@
     }
   }
 
-  async function setStatus(status) {
-    if (!currentUser) return;
-    await db.from('profiles').update({ status }).eq('id', currentUser.id);
-  }
 
   // ── CHAT ─────────────────────────────────────────────────
   let chatMessages = [];
@@ -543,6 +510,40 @@
     btn.disabled = false;
     input.focus();
   }
+
+
+  // ── auto online / offline ─────────────────────────────────
+  async function setOnline() {
+    if (!currentUser) return;
+    await db.from('profiles').update({ status: 'online' }).eq('id', currentUser.id);
+  }
+
+  async function setOffline() {
+    if (!currentUser) return;
+    // sendBeacon для надёжности при закрытии вкладки
+    const url = SUPABASE_URL + '/rest/v1/profiles?id=eq.' + currentUser.id;
+    const body = JSON.stringify({ status: 'offline' });
+    navigator.sendBeacon
+      ? navigator.sendBeacon(url + '&apikey=' + SUPABASE_KEY, new Blob([body], {type:'application/json'}))
+      : fetch(url, { method:'PATCH', headers:{ 'Content-Type':'application/json', 'apikey': SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY }, body, keepalive:true });
+  }
+
+  // Вкладка скрыта / показана
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      stopStudyTimer();
+      setOffline();
+    } else {
+      setOnline();
+      startStudyTimer();
+    }
+  });
+
+  // Закрытие вкладки
+  window.addEventListener('beforeunload', () => {
+    stopStudyTimer();
+    setOffline();
+  });
 
   // ── screens ───────────────────────────────────────────────
   function showLoading() {
