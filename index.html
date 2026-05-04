@@ -1,90 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>статусы группы</title>
+  <title>Статусы группы</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{min-height:100vh;background:#0d0d14;font-family:"segoe ui",sans-serif;color:#fff;padding:0 0 80px}
+    body{min-height:100vh;background:#0d0d14;font-family:"Segoe UI",sans-serif;color:#fff;padding:0 0 80px}
 
-    /* header */
+    /* HEADER */
     .header{padding:18px 20px 0;max-width:520px;margin:0 auto}
-    .header-label{font-size:0.65rem;letter-spacing:2px;color:#07ca6b;text-transform:uppercase;margin-bottom:4px}
+    .header-label{font-size:0.65rem;letter-spacing:2px;color:#07CA6B;text-transform:uppercase;margin-bottom:4px}
     .header h1{font-size:1.8rem;font-weight:800;line-height:1.1}
-    .header h1 span{color:#07ca6b}
+    .header h1 span{color:#07CA6B}
 
-    /* wrap */
+    /* WRAP */
     .wrap{max-width:520px;margin:0 auto;padding:0 12px}
 
-    /* cards */
+    /* CARDS */
     .card{background:#16161f;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 20px;margin-top:14px}
 
-    /* session */
+    /* SESSION */
     .sess-label{font-size:0.65rem;letter-spacing:1.5px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:10px}
     .sess-name{font-size:0.95rem;font-weight:600;margin-bottom:8px;text-align:center}
-    .sess-timer{font-size:2.4rem;font-weight:800;color:#07ca6b;text-align:center;letter-spacing:-1px;display:flex;align-items:center;justify-content:center;gap:10px}
+    .sess-timer{font-size:2.4rem;font-weight:800;color:#07CA6B;text-align:center;letter-spacing:-1px;display:flex;align-items:center;justify-content:center;gap:10px}
     .sess-timer svg{flex-shrink:0}
     .sess-status-txt{text-align:center;font-size:0.82rem;font-weight:600;letter-spacing:1px;margin:4px 0 14px;text-transform:uppercase}
     .sess-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
     .sbtn{padding:11px 6px;border-radius:10px;border:none;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s}
-    .sbtn:hover{transform:translatey(-1px);filter:brightness(1.1)}
+    .sbtn:hover{transform:translateY(-1px);filter:brightness(1.1)}
     .sbtn:active{transform:scale(0.97)}
-    .sbtn-start{background:#07ca6b;color:#000}
-    .sbtn-end{background:#ea2143;color:#fff}
+    .sbtn-start{background:#07CA6B;color:#000}
+    .sbtn-end{background:#EA2143;color:#fff}
     .sbtn-break{background:#f59e0b;color:#000}
     .sbtn-logout{background:#2a2a3a;color:rgba(255,255,255,0.5)}
 
-    /* profile */
+    /* PROFILE */
     .prof-row{display:flex;align-items:center;gap:12px}
     .av-wrap{position:relative;flex-shrink:0}
     .avatar{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;overflow:hidden}
     .avatar img{width:100%;height:100%;object-fit:cover}
     .online-dot{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;border:2px solid #16161f;background:#4b5563;transition:background 0.3s}
-    .online-dot.on{background:#07ca6b;animation:pg 2s infinite}
+    .online-dot.on{background:#07CA6B;animation:pg 2s infinite}
     @keyframes pg{0%,100%{box-shadow:0 0 0 0 rgba(7,202,107,0.5)}50%{box-shadow:0 0 0 4px rgba(7,202,107,0)}}
     .prof-info{flex:1;min-width:0}
     .prof-name{font-weight:700;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .prof-online{font-size:0.75rem;color:#07ca6b;margin-bottom:4px}
+    .prof-online{font-size:0.75rem;color:#07CA6B;margin-bottom:4px}
     .prof-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
     .achv-chip{padding:3px 8px;border-radius:6px;font-size:0.7rem;font-weight:600;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12)}
     .achv-chip.legendary{background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.4);color:#fbbf24}
     .achv-chip.epic{background:rgba(167,139,250,0.15);border-color:rgba(167,139,250,0.4);color:#a78bfa}
-    .achv-chip.common{background:rgba(7,202,107,0.12);border-color:rgba(7,202,107,0.3);color:#07ca6b}
+    .achv-chip.common{background:rgba(7,202,107,0.12);border-color:rgba(7,202,107,0.3);color:#07CA6B}
 
-    /* stats row */
+    /* STATS ROW */
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:14px;border-top:1px solid rgba(255,255,255,0.07);padding-top:14px}
     .stat-cell{text-align:center}
-    .stat-val{font-size:1.1rem;font-weight:800;color:#07ca6b}
+    .stat-val{font-size:1.1rem;font-weight:800;color:#07CA6B}
     .stat-lbl{font-size:0.62rem;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-top:2px}
 
-    /* status picker */
+    /* STATUS PICKER */
     .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
     .spick{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#1e1e2e;color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:inherit}
     .spick:hover{border-color:rgba(255,255,255,0.25);background:#252535}
     .spick.active{border-color:var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 12%,#1e1e2e)}
     .spick-dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
 
-    /* group summary */
+    /* GROUP SUMMARY */
     .group-summary{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,0.07);padding-top:14px;margin-top:14px}
     .gs-cell{text-align:center}
     .gs-val{font-size:1.2rem;font-weight:800}
     .gs-lbl{font-size:0.62rem;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-top:2px}
-    .gs-studying .gs-val{color:#07ca6b}
+    .gs-studying .gs-val{color:#07CA6B}
     .gs-break .gs-val{color:#f59e0b}
     .gs-offline .gs-val{color:rgba(255,255,255,0.4)}
 
-    /* tabs */
+    /* TABS */
     .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;background:#1a1a26;border-radius:10px;padding:3px;gap:2px;margin-top:14px}
     .tab{padding:8px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,0.45);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px}
     .tab.active{background:#252535;color:#fff}
 
-    /* panels */
+    /* PANELS */
     .panel{display:none}
     .panel.active{display:block}
 
-    /* users list */
+    /* USERS LIST */
     .user-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:14px}
     .user-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#1e1e2e;border:1px solid rgba(255,255,255,0.06);transition:background 0.15s}
     .user-item:hover{background:#252535}
@@ -97,26 +97,26 @@
     .item-sub{font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:1px}
     .status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:500;white-space:nowrap}
     .sbdot{width:6px;height:6px;border-radius:50%}
-    .badge-studying{background:rgba(7,202,107,0.15);color:#07ca6b}
-    .badge-studying .sbdot{background:#07ca6b}
-    .badge-away{background:rgba(232,149,88,0.15);color:#e89558}
-    .badge-away .sbdot{background:#e89558}
+    .badge-studying{background:rgba(7,202,107,0.15);color:#07CA6B}
+    .badge-studying .sbdot{background:#07CA6B}
+    .badge-away{background:rgba(232,149,88,0.15);color:#E89558}
+    .badge-away .sbdot{background:#E89558}
     .badge-break{background:rgba(251,191,36,0.15);color:#fbbf24}
     .badge-break .sbdot{background:#fbbf24}
-    .badge-dnd{background:rgba(234,33,67,0.15);color:#ea2143}
-    .badge-dnd .sbdot{background:#ea2143}
+    .badge-dnd{background:rgba(234,33,67,0.15);color:#EA2143}
+    .badge-dnd .sbdot{background:#EA2143}
     .badge-offline{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.4)}
     .badge-offline .sbdot{background:rgba(255,255,255,0.3)}
 
-    /* leaderboard */
+    /* LEADERBOARD */
     .lb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#1e1e2e;border:1px solid rgba(255,255,255,0.06);margin-top:8px}
     .lb-rank{font-size:1.1rem;width:28px;text-align:center;flex-shrink:0}
     .lb-info{flex:1;min-width:0}
     .lb-name{font-weight:600;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .lb-sub{font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:1px}
-    .lb-time{font-weight:700;font-size:0.9rem;color:#07ca6b;text-align:right;white-space:nowrap}
+    .lb-time{font-weight:700;font-size:0.9rem;color:#07CA6B;text-align:right;white-space:nowrap}
 
-    /* achievements grid */
+    /* ACHIEVEMENTS GRID */
     .achv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
     .achv-card{padding:14px;border-radius:12px;background:#1e1e2e;border:1px solid rgba(255,255,255,0.06);position:relative;transition:all 0.2s}
     .achv-card.locked{opacity:0.4;filter:grayscale(1)}
@@ -128,22 +128,22 @@
     .achv-name{font-size:0.82rem;font-weight:700;margin-bottom:3px}
     .achv-desc{font-size:0.7rem;color:rgba(255,255,255,0.45);line-height:1.4}
     .achv-rarity{display:inline-block;margin-top:6px;font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:4px}
-    .rarity-common{background:rgba(7,202,107,0.15);color:#07ca6b}
+    .rarity-common{background:rgba(7,202,107,0.15);color:#07CA6B}
     .rarity-epic{background:rgba(167,139,250,0.15);color:#a78bfa}
     .rarity-legendary{background:rgba(251,191,36,0.15);color:#fbbf24}
     .achv-count{font-size:0.65rem;color:rgba(255,255,255,0.3);position:absolute;top:10px;right:10px}
 
-    /* toast */
-    #toast{position:fixed;bottom:24px;left:50%;transform:translatex(-50%) translatey(80px);background:#1e1e2e;border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:12px 20px;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:10px;z-index:999;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
-    #toast.show{transform:translatex(-50%) translatey(0)}
+    /* TOAST */
+    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e1e2e;border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:12px 20px;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:10px;z-index:999;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
+    #toast.show{transform:translateX(-50%) translateY(0)}
 
-    /* chat */
+    /* CHAT */
     .chat-msgs{height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0;margin-top:10px}
     .chat-msgs::-webkit-scrollbar{width:4px}
     .chat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px}
     .msg{display:flex;gap:8px;align-items:flex-start;animation:fi 0.2s ease}
     .msg.mine{flex-direction:row-reverse}
-    @keyframes fi{from{opacity:0;transform:translatey(5px)}to{opacity:1;transform:none}}
+    @keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
     .msg-av{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;flex-shrink:0;overflow:hidden}
     .msg-av img{width:100%;height:100%;object-fit:cover}
     .msg-body{max-width:78%}
@@ -160,15 +160,15 @@
     .chat-send:hover{transform:scale(1.05)}
     .chat-send:disabled{opacity:0.4;cursor:default;transform:none}
 
-    /* login */
-    #loginscreen{width:100%;max-width:380px;margin:60px auto 0;background:#16161f;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:36px;text-align:center;display:none}
+    /* LOGIN */
+    #loginScreen{width:100%;max-width:380px;margin:60px auto 0;background:#16161f;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:36px;text-align:center;display:none}
     .login-icon{font-size:2.5rem;margin-bottom:14px}
     .login-title{font-size:1.15rem;font-weight:700;margin-bottom:6px}
     .login-desc{font-size:0.82rem;color:rgba(255,255,255,0.45);margin-bottom:24px;line-height:1.6}
     .btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:12px 20px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:inherit}
-    .btn-google:hover{background:rgba(255,255,255,0.14);transform:translatey(-1px)}
+    .btn-google:hover{background:rgba(255,255,255,0.14);transform:translateY(-1px)}
 
-    #loadingscreen{color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center;padding:80px 20px}
+    #loadingScreen{color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center;padding:80px 20px}
     .loader-txt{color:rgba(255,255,255,0.3);text-align:center;padding:20px;font-size:0.82rem}
 
     .section-divider{font-size:0.65rem;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:2px;margin-top:4px}
@@ -176,145 +176,145 @@
 </head>
 <body>
 
-<div id="loadingscreen">загрузка…</div>
+<div id="loadingScreen">Загрузка…</div>
 
-<div id="loginscreen">
+<div id="loginScreen">
   <div class="login-icon">📊</div>
-  <div class="login-title">статусы группы</div>
-  <p class="login-desc">войдите через google, чтобы присоединиться к группе</p>
-  <button class="btn-google" onclick="loginwithgoogle()">
-    <svg width="18" height="18" viewbox="0 0 48 48">
-      <path fill="#ffc107" d="m43.6 20.1h42v20h24v8h11.3c33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7c34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/>
-      <path fill="#ff3d00" d="m6.3 14.7l6.6 4.8c14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7c34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
-      <path fill="#4caf50" d="m24 44c5.2 0 9.8-1.9 13.3-5.1l-6.2-5.2c29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5c9.5 39.6 16.2 44 24 44z"/>
-      <path fill="#1976d2" d="m43.6 20.1h42v20h24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2c37 36.9 44 31 44 24c0-1.3-.1-2.7-.4-3.9z"/>
+  <div class="login-title">Статусы группы</div>
+  <p class="login-desc">Войдите через Google, чтобы присоединиться к группе</p>
+  <button class="btn-google" onclick="loginWithGoogle()">
+    <svg width="18" height="18" viewBox="0 0 48 48">
+      <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.9z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5.2 0 9.8-1.9 13.3-5.1l-6.2-5.2C29.2 35.3 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.5l6.2 5.2C37 36.9 44 31 44 24c0-1.3-.1-2.7-.4-3.9z"/>
     </svg>
-    войти через google
+    Войти через Google
   </button>
 </div>
 
-<div id="appscreen" style="display:none">
+<div id="appScreen" style="display:none">
   <div class="header">
-    <div class="header-label">realtime monitor</div>
-    <h1>статусы <span>группы</span></h1>
+    <div class="header-label">Realtime Monitor</div>
+    <h1>Статусы <span>группы</span></h1>
   </div>
 
   <div class="wrap">
 
-    <!-- session card -->
+    <!-- SESSION CARD -->
     <div class="card">
-      <div class="sess-label">сессия учёбы</div>
-      <div class="sess-name" id="sessname">…</div>
+      <div class="sess-label">Сессия учёбы</div>
+      <div class="sess-name" id="sessName">…</div>
       <div class="sess-timer">
-        <svg width="28" height="28" viewbox="0 0 24 24" fill="none" stroke="#07ca6b" stroke-width="2.2"><circle cx="12" cy="13" r="8"/><path d="m12 9v4l3 2"/><path d="m9 2h6m12 2v3"/></svg>
-        <span id="sesstimerdisplay">0 сек.</span>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#07CA6B" stroke-width="2.2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6M12 2v3"/></svg>
+        <span id="sessTimerDisplay">0 сек.</span>
       </div>
-      <div class="sess-status-txt" id="sessstatustxt" style="color:#f59e0b">● перерыв</div>
+      <div class="sess-status-txt" id="sessStatusTxt" style="color:#f59e0b">● ПЕРЕРЫВ</div>
       <div class="sess-btns">
-        <button class="sbtn sbtn-start" onclick="sessaction(\'studying\')">▶ продолжить</button>
-        <button class="sbtn sbtn-end" onclick="sessend()">■ завершить</button>
-        <button class="sbtn sbtn-logout" onclick="logout()">выход</button>
+        <button class="sbtn sbtn-start" onclick="sessAction('studying')">▶ Продолжить</button>
+        <button class="sbtn sbtn-end" onclick="sessEnd()">■ Завершить</button>
+        <button class="sbtn sbtn-logout" onclick="logout()">Выход</button>
       </div>
     </div>
 
-    <!-- profile card -->
+    <!-- PROFILE CARD -->
     <div class="card">
-      <div class="sess-label">ваш профиль</div>
+      <div class="sess-label">Ваш профиль</div>
       <div class="prof-row">
         <div class="av-wrap">
-          <div class="avatar" id="myavatar">?</div>
-          <span class="online-dot" id="myonlinedot"></span>
+          <div class="avatar" id="myAvatar">?</div>
+          <span class="online-dot" id="myOnlineDot"></span>
         </div>
         <div class="prof-info">
-          <div class="prof-name" id="myusername">…</div>
-          <div class="prof-online" id="myonlinetxt">● в сети</div>
-          <div class="prof-badges" id="myachvbadges"></div>
+          <div class="prof-name" id="myUsername">…</div>
+          <div class="prof-online" id="myOnlineTxt">● В сети</div>
+          <div class="prof-badges" id="myAchvBadges"></div>
         </div>
       </div>
 
       <div class="stats-row">
         <div class="stat-cell">
-          <div class="stat-val" id="statstudy">0с</div>
-          <div class="stat-lbl">учёба</div>
+          <div class="stat-val" id="statStudy">0с</div>
+          <div class="stat-lbl">Учёба</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-val" id="statsessions">0</div>
-          <div class="stat-lbl">сессий</div>
+          <div class="stat-val" id="statSessions">0</div>
+          <div class="stat-lbl">Сессий</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-val" id="statmsgs">0</div>
-          <div class="stat-lbl">сообщ.</div>
+          <div class="stat-val" id="statMsgs">0</div>
+          <div class="stat-lbl">Сообщ.</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-val" id="statachv">0</div>
-          <div class="stat-lbl">достиж.</div>
+          <div class="stat-val" id="statAchv">0</div>
+          <div class="stat-lbl">Достиж.</div>
         </div>
       </div>
 
-      <!-- status picker -->
-      <div class="status-grid" id="statuspicker">
-        <button class="spick" style="--c:#07ca6b" data-status="studying" onclick="setstatus(\'studying\')">
-          <span class="spick-dot"></span>в сети
+      <!-- STATUS PICKER -->
+      <div class="status-grid" id="statusPicker">
+        <button class="spick" style="--c:#07CA6B" data-status="studying" onclick="setStatus('studying')">
+          <span class="spick-dot"></span>В сети
         </button>
-        <button class="spick" style="--c:#e89558" data-status="away" onclick="setstatus(\'away\')">
-          <span class="spick-dot"></span>отошёл
+        <button class="spick" style="--c:#E89558" data-status="away" onclick="setStatus('away')">
+          <span class="spick-dot"></span>Отошёл
         </button>
-        <button class="spick" style="--c:#ea2143" data-status="dnd" onclick="setstatus(\'dnd\')">
-          <span class="spick-dot"></span>занят
+        <button class="spick" style="--c:#EA2143" data-status="dnd" onclick="setStatus('dnd')">
+          <span class="spick-dot"></span>Занят
         </button>
-        <button class="spick" style="--c:#6b7280" data-status="dnd2" onclick="setstatus(\'dnd2\')">
-          <span class="spick-dot"></span>не беспокоить
+        <button class="spick" style="--c:#6b7280" data-status="dnd2" onclick="setStatus('dnd2')">
+          <span class="spick-dot"></span>Не беспокоить
         </button>
       </div>
 
-      <!-- group summary -->
+      <!-- GROUP SUMMARY -->
       <div class="group-summary">
         <div class="gs-cell gs-studying">
-          <div class="gs-val" id="gsstudying">0</div>
-          <div class="gs-lbl">учатся</div>
+          <div class="gs-val" id="gsStudying">0</div>
+          <div class="gs-lbl">Учатся</div>
         </div>
         <div class="gs-cell gs-break">
-          <div class="gs-val" id="gsbreak">0</div>
-          <div class="gs-lbl">перерыв</div>
+          <div class="gs-val" id="gsBreak">0</div>
+          <div class="gs-lbl">Перерыв</div>
         </div>
         <div class="gs-cell gs-offline">
-          <div class="gs-val" id="gsoffline">0</div>
-          <div class="gs-lbl">офлайн</div>
+          <div class="gs-val" id="gsOffline">0</div>
+          <div class="gs-lbl">Офлайн</div>
         </div>
       </div>
     </div>
 
-    <!-- tabs -->
+    <!-- TABS -->
     <div class="tabs">
-      <button class="tab active" id="tabmembers" onclick="switchtab(\'members\')">👥 участники</button>
-      <button class="tab" id="tabrating" onclick="switchtab(\'rating\')">🏆 рейтинг</button>
-      <button class="tab" id="tabachv" onclick="switchtab(\'achv\')">🎖 достижения</button>
+      <button class="tab active" id="tabMembers" onclick="switchTab('members')">👥 Участники</button>
+      <button class="tab" id="tabRating" onclick="switchTab('rating')">🏆 Рейтинг</button>
+      <button class="tab" id="tabAchv" onclick="switchTab('achv')">🎖 Достижения</button>
     </div>
 
-    <!-- panel: members -->
-    <div id="panelmembers" class="panel active">
-      <ul class="user-list" id="userlist"><li class="loader-txt">загрузка…</li></ul>
+    <!-- PANEL: MEMBERS -->
+    <div id="panelMembers" class="panel active">
+      <ul class="user-list" id="userList"><li class="loader-txt">Загрузка…</li></ul>
     </div>
 
-    <!-- panel: rating -->
-    <div id="panelrating" class="panel">
-      <div id="lblist"><div class="loader-txt">загрузка…</div></div>
+    <!-- PANEL: RATING -->
+    <div id="panelRating" class="panel">
+      <div id="lbList"><div class="loader-txt">Загрузка…</div></div>
     </div>
 
-    <!-- panel: achievements -->
-    <div id="panelachv" class="panel">
-      <div class="achv-grid" id="achvgrid"><div class="loader-txt" style="grid-column:span 2">загрузка…</div></div>
+    <!-- PANEL: ACHIEVEMENTS -->
+    <div id="panelAchv" class="panel">
+      <div class="achv-grid" id="achvGrid"><div class="loader-txt" style="grid-column:span 2">Загрузка…</div></div>
     </div>
 
-    <!-- chat -->
+    <!-- CHAT -->
     <div class="card" style="margin-top:14px;padding:18px 20px">
-      <div class="sess-label" style="margin-bottom:0">💬 общий чат</div>
-      <div class="chat-msgs" id="chatmsgs"><div class="loader-txt">загрузка…</div></div>
+      <div class="sess-label" style="margin-bottom:0">💬 Общий чат</div>
+      <div class="chat-msgs" id="chatMsgs"><div class="loader-txt">Загрузка…</div></div>
       <div class="chat-row">
-        <input class="chat-in" id="chatin" placeholder="сообщение…" maxlength="500"
-          onkeydown="if(event.key===\'enter\')sendmsg()"/>
-        <button class="chat-send" onclick="sendmsg()" id="chatbtn">
-          <svg width="15" height="15" viewbox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <input class="chat-in" id="chatIn" placeholder="Сообщение…" maxlength="500"
+          onkeydown="if(event.key==='Enter')sendMsg()"/>
+        <button class="chat-send" onclick="sendMsg()" id="chatBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
         </button>
@@ -324,213 +324,213 @@
   </div>
 </div>
 
-<!-- toast -->
-<div id="toast">🎖 достижение разблокировано!</div>
+<!-- TOAST -->
+<div id="toast">🎖 Достижение разблокировано!</div>
 
 <script>
-const supabase_url = "https://vwjuqdgumxhjbkowepfx.supabase.co";
-const supabase_key = "eyjhbgcioijiuzi1niisinr5cci6ikpxvcj9.eyjpc3mioijzdxbhymfzzsisinjlzii6inz3anvxzgd1bxhoamjrb3dlcgz4iiwicm9szsi6imfub24ilcjpyxqioje3nzu2mzeymjqsimv4cci6mja5mtiwnziynh0.do7waaphgigr0atwouuv0lketgjyyoqwszw5dzwf59k";
-const { createclient } = supabase;
-const db = createclient(supabase_url, supabase_key);
+const SUPABASE_URL = "https://vwjuqdgumxhjbkowepfx.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3anVxZGd1bXhoamJrb3dlcGZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzEyMjQsImV4cCI6MjA5MTIwNzIyNH0.DO7WAaPhGIGr0AtwOuuV0lketGjyyOqWSZw5dzWf59k";
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentuser = null;
-let studyseconds = 0;
-let sessseconds = 0;
-let studyinterval = null;
-let sessinterval = null;
-let currentstatus = "offline";
-let sessionid = null;
-let sessionstarted = false;
-let myachievements = new set();
-let mymsgcount = 0;
-let mysessions = 0;
-let allprofiles = [];
-let chatmessages = [];
+let currentUser = null;
+let studySeconds = 0;
+let sessSeconds = 0;
+let studyInterval = null;
+let sessInterval = null;
+let currentStatus = "offline";
+let sessionId = null;
+let sessionStarted = false;
+let myAchievements = new Set();
+let myMsgCount = 0;
+let mySessions = 0;
+let allProfiles = [];
+let chatMessages = [];
 
-// ── achievements definition ────────────────────────────────
-const achievements = [
-  { key:"first_session",    icon:"🌱", name:"первый шаг",        desc:"провёл первую учебную сессию",          rarity:"common",    check: (d) => d.sessions >= 1 },
-  { key:"early_bird",       icon:"🐦", name:"ранняя пташка",     desc:"вошёл в систему до 8:00",               rarity:"common",    check: (d) => d.earlybird },
-  { key:"comeback",         icon:"🔄", name:"возвращение",       desc:"вернулся к учёбе после перерыва",       rarity:"common",    check: (d) => d.comeback },
-  { key:"chat_active",      icon:"💬", name:"активист",          desc:"написал 20 сообщений в чате",           rarity:"common",    check: (d) => d.msgs >= 20 },
-  { key:"hour_study",       icon:"⏰", name:"час учёбы",         desc:"набрал 1 час суммарно",                 rarity:"common",    check: (d) => d.totalsecs >= 3600 },
-  { key:"marathon",         icon:"🏃", name:"марафонец",         desc:"проучился 2+ часа за одну сессию",      rarity:"epic",      check: (d) => d.sessmaxsecs >= 7200 },
-  { key:"ten_sessions",     icon:"📅", name:"регулярность",      desc:"провёл 10 учебных сессий",              rarity:"epic",      check: (d) => d.sessions >= 10 },
-  { key:"dedication",       icon:"💪", name:"дедикация",         desc:"набрал 10 часов суммарно",              rarity:"epic",      check: (d) => d.totalsecs >= 36000 },
-  { key:"chat_legend",      icon:"🎙", name:"душа компании",     desc:"написал 50 сообщений в чате",           rarity:"epic",      check: (d) => d.msgs >= 50 },
-  { key:"legend_20h",       icon:"⚡", name:"легенда",           desc:"набрал 20 часов суммарно",              rarity:"legendary", check: (d) => d.totalsecs >= 72000 },
-  { key:"podium",           icon:"🏆", name:"пьедестал",         desc:"вошёл в топ-3 рейтинга",               rarity:"legendary", check: (d) => d.topthree },
-  { key:"workaholic",       icon:"🔥", name:"трудоголик",        desc:"набрал 6 часов учёбы суммарно",         rarity:"epic",      check: (d) => d.totalsecs >= 21600 },
-  { key:"night_owl",        icon:"🦉", name:"сова",              desc:"вошёл в систему после 23:00",           rarity:"common",    check: (d) => d.nightowl },
-  { key:"consistent_week",  icon:"📆", name:"неделя в строю",    desc:"провёл сессии 7 дней подряд",          rarity:"legendary", check: (d) => d.streak7 },
+// ── ACHIEVEMENTS DEFINITION ────────────────────────────────
+const ACHIEVEMENTS = [
+  { key:"first_session",    icon:"🌱", name:"Первый шаг",        desc:"Провёл первую учебную сессию",          rarity:"common",    check: (d) => d.sessions >= 1 },
+  { key:"early_bird",       icon:"🐦", name:"Ранняя пташка",     desc:"Вошёл в систему до 8:00",               rarity:"common",    check: (d) => d.earlyBird },
+  { key:"comeback",         icon:"🔄", name:"Возвращение",       desc:"Вернулся к учёбе после перерыва",       rarity:"common",    check: (d) => d.comeback },
+  { key:"chat_active",      icon:"💬", name:"Активист",          desc:"Написал 20 сообщений в чате",           rarity:"common",    check: (d) => d.msgs >= 20 },
+  { key:"hour_study",       icon:"⏰", name:"Час учёбы",         desc:"Набрал 1 час суммарно",                 rarity:"common",    check: (d) => d.totalSecs >= 3600 },
+  { key:"marathon",         icon:"🏃", name:"Марафонец",         desc:"Проучился 2+ часа за одну сессию",      rarity:"epic",      check: (d) => d.sessMaxSecs >= 7200 },
+  { key:"ten_sessions",     icon:"📅", name:"Регулярность",      desc:"Провёл 10 учебных сессий",              rarity:"epic",      check: (d) => d.sessions >= 10 },
+  { key:"dedication",       icon:"💪", name:"Дедикация",         desc:"Набрал 10 часов суммарно",              rarity:"epic",      check: (d) => d.totalSecs >= 36000 },
+  { key:"chat_legend",      icon:"🎙", name:"Душа компании",     desc:"Написал 50 сообщений в чате",           rarity:"epic",      check: (d) => d.msgs >= 50 },
+  { key:"legend_20h",       icon:"⚡", name:"Легенда",           desc:"Набрал 20 часов суммарно",              rarity:"legendary", check: (d) => d.totalSecs >= 72000 },
+  { key:"podium",           icon:"🏆", name:"Пьедестал",         desc:"Вошёл в топ-3 рейтинга",               rarity:"legendary", check: (d) => d.topThree },
+  { key:"workaholic",       icon:"🔥", name:"Трудоголик",        desc:"Набрал 6 часов учёбы суммарно",         rarity:"epic",      check: (d) => d.totalSecs >= 21600 },
+  { key:"night_owl",        icon:"🦉", name:"Сова",              desc:"Вошёл в систему после 23:00",           rarity:"common",    check: (d) => d.nightOwl },
+  { key:"consistent_week",  icon:"📆", name:"Неделя в строю",    desc:"Провёл сессии 7 дней подряд",          rarity:"legendary", check: (d) => d.streak7 },
 ];
 
-// ── helpers ────────────────────────────────────────────────
-function initials(n){ if(!n)return"?"; return n.split(" ").map(w=>w[0]).join("").touppercase().slice(0,2); }
-function isonline(s){ return s && s!=="offline"; }
-function fmtsecs(s){
-  const h=math.floor(s/3600),m=math.floor((s%3600)/60),sec=s%60;
+// ── HELPERS ────────────────────────────────────────────────
+function initials(n){ if(!n)return"?"; return n.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2); }
+function isOnline(s){ return s && s!=="offline"; }
+function fmtSecs(s){
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
   if(h>0)return h+"ч "+m+"м";
   if(m>0)return m+"м "+sec+"с";
   return sec+" сек.";
 }
-function fmtsecsshort(s){
-  const h=math.floor(s/3600),m=math.floor((s%3600)/60);
+function fmtSecsShort(s){
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);
   if(h>0)return h+"ч "+m+"м";
   if(m>0)return m+"м";
   return s+"с";
 }
-function timeago(iso){
-  const diff=math.floor((date.now()-new date(iso))/1000);
+function timeAgo(iso){
+  const diff=Math.floor((Date.now()-new Date(iso))/1000);
   if(diff<60)return"только что";
-  if(diff<3600)return math.floor(diff/60)+" мин назад";
-  return new date(iso).tolocaletimestring("ru",{hour:"2-digit",minute:"2-digit"});
+  if(diff<3600)return Math.floor(diff/60)+" мин назад";
+  return new Date(iso).toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"});
 }
 function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-const status_cfg = {
-  studying:{ label:"в сети",          badge:"badge-studying", color:"#07ca6b" },
-  away:    { label:"отошёл",          badge:"badge-away",     color:"#e89558" },
-  break:   { label:"перерыв",         badge:"badge-break",    color:"#fbbf24" },
-  dnd:     { label:"занят",           badge:"badge-dnd",      color:"#ea2143" },
-  dnd2:    { label:"не беспокоить",   badge:"badge-dnd",      color:"#6b7280" },
-  offline: { label:"не в сети",       badge:"badge-offline",  color:"#6b7280" },
+const STATUS_CFG = {
+  studying:{ label:"В сети",          badge:"badge-studying", color:"#07CA6B" },
+  away:    { label:"Отошёл",          badge:"badge-away",     color:"#E89558" },
+  break:   { label:"Перерыв",         badge:"badge-break",    color:"#fbbf24" },
+  dnd:     { label:"Занят",           badge:"badge-dnd",      color:"#EA2143" },
+  dnd2:    { label:"Не беспокоить",   badge:"badge-dnd",      color:"#6b7280" },
+  offline: { label:"Не в сети",       badge:"badge-offline",  color:"#6b7280" },
 };
 
-// ── toast ──────────────────────────────────────────────────
-function showtoast(msg){
-  const t=document.getelementbyid("toast");
-  t.textcontent=msg;
-  t.classlist.add("show");
-  settimeout(()=>t.classlist.remove("show"),3500);
+// ── TOAST ──────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3500);
 }
 
-// ── tabs ───────────────────────────────────────────────────
-function switchtab(tab){
-  ["members","rating","achv"].foreach(t=>{
-    document.getelementbyid("panel"+t.charat(0).touppercase()+t.slice(1)).classlist.toggle("active",t===tab);
-    document.getelementbyid("tab"+t.charat(0).touppercase()+t.slice(1)).classlist.toggle("active",t===tab);
+// ── TABS ───────────────────────────────────────────────────
+function switchTab(tab){
+  ["members","rating","achv"].forEach(t=>{
+    document.getElementById("panel"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active",t===tab);
+    document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active",t===tab);
   });
-  if(tab==="rating")renderleaderboard();
-  if(tab==="achv")renderachievements();
+  if(tab==="rating")renderLeaderboard();
+  if(tab==="achv")renderAchievements();
 }
 
-// ── session timer ──────────────────────────────────────────
-function startsesstimer(){
-  if(sessinterval)return;
-  sessinterval=setinterval(()=>{
-    sessseconds++;
-    document.getelementbyid("sesstimerdisplay").textcontent=fmtsecs(sessseconds);
+// ── SESSION TIMER ──────────────────────────────────────────
+function startSessTimer(){
+  if(sessInterval)return;
+  sessInterval=setInterval(()=>{
+    sessSeconds++;
+    document.getElementById("sessTimerDisplay").textContent=fmtSecs(sessSeconds);
   },1000);
 }
-function stopsesstimer(){
-  if(sessinterval){clearinterval(sessinterval);sessinterval=null;}
+function stopSessTimer(){
+  if(sessInterval){clearInterval(sessInterval);sessInterval=null;}
 }
 
-// ── study timer ────────────────────────────────────────────
-function startstudytimer(){
-  if(studyinterval)return;
-  studyinterval=setinterval(async()=>{
-    studyseconds++;
-    document.getelementbyid("statstudy").textcontent=fmtsecsshort(studyseconds);
-    if(studyseconds%30===0&&currentuser){
-      await db.from("profiles").update({study_seconds:studyseconds}).eq("id",currentuser.id);
+// ── STUDY TIMER ────────────────────────────────────────────
+function startStudyTimer(){
+  if(studyInterval)return;
+  studyInterval=setInterval(async()=>{
+    studySeconds++;
+    document.getElementById("statStudy").textContent=fmtSecsShort(studySeconds);
+    if(studySeconds%30===0&&currentUser){
+      await db.from("profiles").update({study_seconds:studySeconds}).eq("id",currentUser.id);
     }
   },1000);
 }
-function stopstudytimer(){
-  if(studyinterval){clearinterval(studyinterval);studyinterval=null;}
-  if(currentuser&&studyseconds>0){
-    db.from("profiles").update({study_seconds:studyseconds}).eq("id",currentuser.id);
+function stopStudyTimer(){
+  if(studyInterval){clearInterval(studyInterval);studyInterval=null;}
+  if(currentUser&&studySeconds>0){
+    db.from("profiles").update({study_seconds:studySeconds}).eq("id",currentUser.id);
   }
 }
 
-// ── session actions ────────────────────────────────────────
-async function sessaction(status){
-  await setstatus(status);
-  const statustxt=document.getelementbyid("sessstatustxt");
+// ── SESSION ACTIONS ────────────────────────────────────────
+async function sessAction(status){
+  await setStatus(status);
+  const statusTxt=document.getElementById("sessStatusTxt");
   if(status==="studying"){
-    statustxt.textcontent="● идёт учёба";
-    statustxt.style.color="#07ca6b";
-    document.queryselector(".sbtn-start").textcontent="⏸ перерыв";
-    document.queryselector(".sbtn-start").onclick=()=>sessaction("break");
-    if(!sessionstarted){
-      sessionstarted=true;
-      mysessions++;
+    statusTxt.textContent="● ИДЁТ УЧЁБА";
+    statusTxt.style.color="#07CA6B";
+    document.querySelector(".sbtn-start").textContent="⏸ Перерыв";
+    document.querySelector(".sbtn-start").onclick=()=>sessAction("break");
+    if(!sessionStarted){
+      sessionStarted=true;
+      mySessions++;
       // создаём сессию
-      const {data}=await db.from("sessions").insert({user_id:currentuser.id,started_at:new date().toisostring(),duration_seconds:0}).select().single();
-      if(data)sessionid=data.id;
-      document.getelementbyid("statsessions").textcontent=mysessions;
-      startsesstimer();
-      startstudytimer();
-      checkachievements();
+      const {data}=await db.from("sessions").insert({user_id:currentUser.id,started_at:new Date().toISOString(),duration_seconds:0}).select().single();
+      if(data)sessionId=data.id;
+      document.getElementById("statSessions").textContent=mySessions;
+      startSessTimer();
+      startStudyTimer();
+      checkAchievements();
     } else {
-      startstudytimer();
-      startsesstimer();
+      startStudyTimer();
+      startSessTimer();
     }
   } else {
-    statustxt.textcontent="● перерыв";
-    statustxt.style.color="#f59e0b";
-    document.queryselector(".sbtn-start").textcontent="▶ продолжить";
-    document.queryselector(".sbtn-start").onclick=()=>sessaction("studying");
-    stopstudytimer();
-    stopsesstimer();
+    statusTxt.textContent="● ПЕРЕРЫВ";
+    statusTxt.style.color="#f59e0b";
+    document.querySelector(".sbtn-start").textContent="▶ Продолжить";
+    document.querySelector(".sbtn-start").onclick=()=>sessAction("studying");
+    stopStudyTimer();
+    stopSessTimer();
     // mark comeback for achievement
-    if(sessionstarted) window._hadbreak=true;
-    checkachievements();
+    if(sessionStarted) window._hadBreak=true;
+    checkAchievements();
   }
 }
 
-async function sessend(){
-  stopstudytimer();
-  stopsesstimer();
+async function sessEnd(){
+  stopStudyTimer();
+  stopSessTimer();
   // save session duration
-  if(sessionid&&sessseconds>0){
-    await db.from("sessions").update({duration_seconds:sessseconds}).eq("id",sessionid);
+  if(sessionId&&sessSeconds>0){
+    await db.from("sessions").update({duration_seconds:sessSeconds}).eq("id",sessionId);
   }
-  sessionstarted=false;
-  sessionid=null;
-  await setstatus("offline");
-  document.getelementbyid("sessstatustxt").textcontent="● завершено";
-  document.getelementbyid("sessstatustxt").style.color="rgba(255,255,255,0.4)";
-  document.queryselector(".sbtn-start").textcontent="▶ продолжить";
-  document.queryselector(".sbtn-start").onclick=()=>sessaction("studying");
-  checkachievements();
+  sessionStarted=false;
+  sessionId=null;
+  await setStatus("offline");
+  document.getElementById("sessStatusTxt").textContent="● ЗАВЕРШЕНО";
+  document.getElementById("sessStatusTxt").style.color="rgba(255,255,255,0.4)";
+  document.querySelector(".sbtn-start").textContent="▶ Продолжить";
+  document.querySelector(".sbtn-start").onclick=()=>sessAction("studying");
+  checkAchievements();
 }
 
-// ── status ─────────────────────────────────────────────────
-async function setstatus(status){
-  if(!currentuser)return;
-  await db.from("profiles").update({status}).eq("id",currentuser.id);
+// ── STATUS ─────────────────────────────────────────────────
+async function setStatus(status){
+  if(!currentUser)return;
+  await db.from("profiles").update({status}).eq("id",currentUser.id);
 }
 
-// ── auth ───────────────────────────────────────────────────
-async function loginwithgoogle(){
-  await db.auth.signinwithoauth({provider:"google",options:{redirectto:window.location.href}});
+// ── AUTH ───────────────────────────────────────────────────
+async function loginWithGoogle(){
+  await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.href}});
 }
 
 async function logout(){
-  stopstudytimer();
-  stopsesstimer();
-  if(sessionid&&sessseconds>0){
-    await db.from("sessions").update({duration_seconds:sessseconds}).eq("id",sessionid);
+  stopStudyTimer();
+  stopSessTimer();
+  if(sessionId&&sessSeconds>0){
+    await db.from("sessions").update({duration_seconds:sessSeconds}).eq("id",sessionId);
   }
-  if(currentuser){
-    await db.from("profiles").update({status:"offline",study_seconds:studyseconds}).eq("id",currentuser.id);
+  if(currentUser){
+    await db.from("profiles").update({status:"offline",study_seconds:studySeconds}).eq("id",currentUser.id);
   }
-  await db.auth.signout();
+  await db.auth.signOut();
 }
 
-async function ensureprofile(user){
+async function ensureProfile(user){
   const meta=user.user_metadata||{};
-  const username=meta.full_name||meta.name||user.email?.split("@")[0]||"user";
+  const username=meta.full_name||meta.name||user.email?.split("@")[0]||"User";
   const avatar_url=meta.avatar_url||meta.picture||null;
-  const hour=new date().gethours();
+  const hour=new Date().getHours();
 
   const {data:ex}=await db.from("profiles").select("id,study_seconds,session_count").eq("id",user.id).single();
   if(ex){
-    studyseconds=ex.study_seconds||0;
-    mysessions=ex.session_count||0;
+    studySeconds=ex.study_seconds||0;
+    mySessions=ex.session_count||0;
     await db.from("profiles").update({username,avatar_url,status:"studying"}).eq("id",user.id);
   } else {
     const p={id:user.id,username,status:"studying",study_seconds:0,session_count:0};
@@ -539,106 +539,106 @@ async function ensureprofile(user){
   }
 
   // early bird / night owl
-  if(hour<8) await unlockachievement("early_bird");
-  if(hour>=23) await unlockachievement("night_owl");
+  if(hour<8) await unlockAchievement("early_bird");
+  if(hour>=23) await unlockAchievement("night_owl");
 
-  document.getelementbyid("statstudy").textcontent=fmtsecsshort(studyseconds);
-  document.getelementbyid("statsessions").textcontent=mysessions;
-  document.getelementbyid("sessname").textcontent=username;
+  document.getElementById("statStudy").textContent=fmtSecsShort(studySeconds);
+  document.getElementById("statSessions").textContent=mySessions;
+  document.getElementById("sessName").textContent=username;
 
   // load my achievements
   const {data:achvs}=await db.from("achievements").select("key").eq("user_id",user.id);
-  myachievements=new set((achvs||[]).map(a=>a.key));
-  document.getelementbyid("statachv").textcontent=myachievements.size;
-  rendermyachvbadges();
+  myAchievements=new Set((achvs||[]).map(a=>a.key));
+  document.getElementById("statAchv").textContent=myAchievements.size;
+  renderMyAchvBadges();
 
   // load msg count
   const {count}=await db.from("messages").select("id",{count:"exact",head:true}).eq("user_id",user.id);
-  mymsgcount=count||0;
-  document.getelementbyid("statmsgs").textcontent=mymsgcount;
+  myMsgCount=count||0;
+  document.getElementById("statMsgs").textContent=myMsgCount;
 }
 
-// ── achievements ───────────────────────────────────────────
-async function unlockachievement(key){
-  if(myachievements.has(key))return;
-  const {error}=await db.from("achievements").insert({user_id:currentuser.id,key}).onconflict?undefined:undefined;
+// ── ACHIEVEMENTS ───────────────────────────────────────────
+async function unlockAchievement(key){
+  if(myAchievements.has(key))return;
+  const {error}=await db.from("achievements").insert({user_id:currentUser.id,key}).onConflict?undefined:undefined;
   if(!error){
-    myachievements.add(key);
-    const achv=achievements.find(a=>a.key===key);
+    myAchievements.add(key);
+    const achv=ACHIEVEMENTS.find(a=>a.key===key);
     if(achv){
-      showtoast(achv.icon+" "+achv.name+" — "+achv.desc);
-      document.getelementbyid("statachv").textcontent=myachievements.size;
-      rendermyachvbadges();
-      await loadall();
+      showToast(achv.icon+" "+achv.name+" — "+achv.desc);
+      document.getElementById("statAchv").textContent=myAchievements.size;
+      renderMyAchvBadges();
+      await loadAll();
     }
   }
 }
 
-async function checkachievements(){
-  if(!currentuser)return;
+async function checkAchievements(){
+  if(!currentUser)return;
   // get max session
-  const {data:sess}=await db.from("sessions").select("duration_seconds").eq("user_id",currentuser.id).order("duration_seconds",{ascending:false}).limit(1);
-  const sessmaxsecs=(sess&&sess[0])?sess[0].duration_seconds:sessseconds;
+  const {data:sess}=await db.from("sessions").select("duration_seconds").eq("user_id",currentUser.id).order("duration_seconds",{ascending:false}).limit(1);
+  const sessMaxSecs=(sess&&sess[0])?sess[0].duration_seconds:sessSeconds;
 
   // get total sessions
-  const {count:sesscount}=await db.from("sessions").select("id",{count:"exact",head:true}).eq("user_id",currentuser.id);
-  const totalsessions=(sesscount||0);
-  if(totalsessions>0) mysessions=totalsessions;
+  const {count:sessCount}=await db.from("sessions").select("id",{count:"exact",head:true}).eq("user_id",currentUser.id);
+  const totalSessions=(sessCount||0);
+  if(totalSessions>0) mySessions=totalSessions;
 
   // check ranking
   const {data:lb}=await db.from("profiles").select("id,study_seconds").order("study_seconds",{ascending:false}).limit(3);
-  const topthree=(lb||[]).some(p=>p.id===currentuser.id);
+  const topThree=(lb||[]).some(p=>p.id===currentUser.id);
 
-  const checkdata={
-    sessions:mysessions,
-    totalsecs:studyseconds,
-    sessmaxsecs:math.max(sessmaxsecs,sessseconds),
-    msgs:mymsgcount,
-    earlybird:false,
-    comeback:window._hadbreak||false,
-    topthree,
-    nightowl:false,
+  const checkData={
+    sessions:mySessions,
+    totalSecs:studySeconds,
+    sessMaxSecs:Math.max(sessMaxSecs,sessSeconds),
+    msgs:myMsgCount,
+    earlyBird:false,
+    comeback:window._hadBreak||false,
+    topThree,
+    nightOwl:false,
     streak7:false,
   };
 
-  for(const achv of achievements){
-    if(!myachievements.has(achv.key)&&achv.check(checkdata)){
-      await unlockachievement(achv.key);
+  for(const achv of ACHIEVEMENTS){
+    if(!myAchievements.has(achv.key)&&achv.check(checkData)){
+      await unlockAchievement(achv.key);
     }
   }
 }
 
-function rendermyachvbadges(){
-  const box=document.getelementbyid("myachvbadges");
-  const unlocked=achievements.filter(a=>myachievements.has(a.key)).slice(0,4);
-  if(!unlocked.length){box.innerhtml="";return;}
-  box.innerhtml=unlocked.map(a=>
+function renderMyAchvBadges(){
+  const box=document.getElementById("myAchvBadges");
+  const unlocked=ACHIEVEMENTS.filter(a=>myAchievements.has(a.key)).slice(0,4);
+  if(!unlocked.length){box.innerHTML="";return;}
+  box.innerHTML=unlocked.map(a=>
     `<span class="achv-chip ${a.rarity}" title="${a.desc}">${a.icon} ${a.name}</span>`
   ).join("");
 }
 
-function renderachievements(){
-  const grid=document.getelementbyid("achvgrid");
-  grid.innerhtml=achievements.map(a=>{
-    const unlocked=myachievements.has(a.key);
+function renderAchievements(){
+  const grid=document.getElementById("achvGrid");
+  grid.innerHTML=ACHIEVEMENTS.map(a=>{
+    const unlocked=myAchievements.has(a.key);
     return `<div class="achv-card ${unlocked?"unlocked "+a.rarity:"locked"}">
       <div class="achv-count">${unlocked?"✓":""}</div>
       <div class="achv-icon">${a.icon}</div>
       <div class="achv-name">${a.name}</div>
       <div class="achv-desc">${a.desc}</div>
-      <span class="achv-rarity rarity-${a.rarity}">${{common:"обычное",epic:"эпическое",legendary:"легендарное"}[a.rarity]}</span>
+      <span class="achv-rarity rarity-${a.rarity}">${{common:"Обычное",epic:"Эпическое",legendary:"Легендарное"}[a.rarity]}</span>
     </div>`;
   }).join("");
 }
 
-// ── leaderboard ────────────────────────────────────────────
-function renderleaderboard(){
-  const sorted=[...allprofiles].sort((a,b)=>(b.study_seconds||0)-(a.study_seconds||0));
+// ── LEADERBOARD ────────────────────────────────────────────
+function renderLeaderboard(){
+  const sorted=[...allProfiles].sort((a,b)=>(b.study_seconds||0)-(a.study_seconds||0));
   const medals=["🥇","🥈","🥉"];
-  if(!sorted.length){document.getelementbyid("lblist").innerhtml=\'<div class="loader-txt">нет данных</div>\';return;}
-  document.getelementbyid("lblist").innerhtml=sorted.map((p,i)=>{
+  if(!sorted.length){document.getElementById("lbList").innerHTML='<div class="loader-txt">Нет данных</div>';return;}
+  document.getElementById("lbList").innerHTML=sorted.map((p,i)=>{
     const av=p.avatar_url?`<img src="${p.avatar_url}" alt="">`:(initials(p.username));
-    const mine=currentuser&&p.id===currentuser.id;
+    const mine=currentUser&&p.id===currentUser.id;
     return `<div class="lb-item" style="${mine?"border-color:rgba(7,202,107,0.35);background:rgba(7,202,107,0.05)":""}">
       <div class="lb-rank">${medals[i]||"#"+(i+1)}</div>
       <div class="av-sm" style="border-radius:8px">${av}</div>
@@ -646,38 +646,38 @@ function renderleaderboard(){
         <div class="lb-name">${p.username||"?"}</div>
         <div class="lb-sub">${p.session_count||0} сессий</div>
       </div>
-      <div class="lb-time">${fmtsecsshort(p.study_seconds||0)}</div>
+      <div class="lb-time">${fmtSecsShort(p.study_seconds||0)}</div>
     </div>`;
   }).join("");
 }
 
-// ── users list ─────────────────────────────────────────────
-function renderlist(profiles){
-  allprofiles=profiles;
-  const ul=document.getelementbyid("userlist");
-  if(!profiles.length){ul.innerhtml=\'<li class="loader-txt">нет пользователей</li>\';return;}
+// ── USERS LIST ─────────────────────────────────────────────
+function renderList(profiles){
+  allProfiles=profiles;
+  const ul=document.getElementById("userList");
+  if(!profiles.length){ul.innerHTML='<li class="loader-txt">Нет пользователей</li>';return;}
 
   const sorted=[...profiles].sort((a,b)=>{
-    const ao=isonline(a.status)?0:1, bo=isonline(b.status)?0:1;
+    const ao=isOnline(a.status)?0:1, bo=isOnline(b.status)?0:1;
     return ao-bo;
   });
 
   // update group summary
   let studying=0,brk=0,offline=0;
-  profiles.foreach(p=>{
+  profiles.forEach(p=>{
     if(p.status==="studying")studying++;
     else if(p.status==="break"||p.status==="away")brk++;
     else offline++;
   });
-  document.getelementbyid("gsstudying").textcontent=studying;
-  document.getelementbyid("gsbreak").textcontent=brk;
-  document.getelementbyid("gsoffline").textcontent=offline;
+  document.getElementById("gsStudying").textContent=studying;
+  document.getElementById("gsBreak").textContent=brk;
+  document.getElementById("gsOffline").textContent=offline;
 
-  ul.innerhtml=sorted.map(p=>{
+  ul.innerHTML=sorted.map(p=>{
     const av=p.avatar_url?`<img src="${p.avatar_url}" alt="">`:initials(p.username);
-    const cfg=status_cfg[p.status]||status_cfg.offline;
-    const online=isonline(p.status);
-    const study=p.study_seconds>0?`⏱ ${fmtsecsshort(p.study_seconds)}`:"";
+    const cfg=STATUS_CFG[p.status]||STATUS_CFG.offline;
+    const online=isOnline(p.status);
+    const study=p.study_seconds>0?`⏱ ${fmtSecsShort(p.study_seconds)}`:"";
     return `<li class="user-item">
       <div class="av-sm-wrap">
         <div class="av-sm">${av}</div>
@@ -694,130 +694,130 @@ function renderlist(profiles){
   }).join("");
 }
 
-// ── render my card ─────────────────────────────────────────
-function rendermycard(profile){
-  const el=document.getelementbyid("myavatar");
-  el.innerhtml=profile.avatar_url?`<img src="${profile.avatar_url}" alt="">`:initials(profile.username);
-  document.getelementbyid("myusername").textcontent=profile.username||"?";
+// ── RENDER MY CARD ─────────────────────────────────────────
+function renderMyCard(profile){
+  const el=document.getElementById("myAvatar");
+  el.innerHTML=profile.avatar_url?`<img src="${profile.avatar_url}" alt="">`:initials(profile.username);
+  document.getElementById("myUsername").textContent=profile.username||"?";
 
   const s=profile.status||"offline";
-  const cfg=status_cfg[s]||status_cfg.offline;
+  const cfg=STATUS_CFG[s]||STATUS_CFG.offline;
 
-  const ondot=document.getelementbyid("myonlinedot");
-  const ontxt=document.getelementbyid("myonlinetxt");
-  if(isonline(s)){
-    ondot.classlist.add("on");
-    ontxt.textcontent="● в сети";
-    ontxt.style.color="#07ca6b";
+  const onDot=document.getElementById("myOnlineDot");
+  const onTxt=document.getElementById("myOnlineTxt");
+  if(isOnline(s)){
+    onDot.classList.add("on");
+    onTxt.textContent="● В сети";
+    onTxt.style.color="#07CA6B";
   } else {
-    ondot.classlist.remove("on");
-    ontxt.textcontent="● не в сети";
-    ontxt.style.color="rgba(255,255,255,0.35)";
+    onDot.classList.remove("on");
+    onTxt.textContent="● Не в сети";
+    onTxt.style.color="rgba(255,255,255,0.35)";
   }
 
-  document.queryselectorall(".spick").foreach(b=>{
-    b.classlist.toggle("active",b.dataset.status===s);
+  document.querySelectorAll(".spick").forEach(b=>{
+    b.classList.toggle("active",b.dataset.status===s);
   });
 
-  if(s==="studying"&&currentstatus!=="studying"){ startstudytimer(); }
-  else if(s!=="studying"&&currentstatus==="studying"){ stopstudytimer(); }
-  currentstatus=s;
+  if(s==="studying"&&currentStatus!=="studying"){ startStudyTimer(); }
+  else if(s!=="studying"&&currentStatus==="studying"){ stopStudyTimer(); }
+  currentStatus=s;
 }
 
-async function loadall(){
+async function loadAll(){
   const {data,error}=await db.from("profiles").select("*");
   if(error){console.error(error);return;}
-  renderlist(data||[]);
-  if(currentuser){
-    const me=(data||[]).find(p=>p.id===currentuser.id);
-    if(me)rendermycard(me);
+  renderList(data||[]);
+  if(currentUser){
+    const me=(data||[]).find(p=>p.id===currentUser.id);
+    if(me)renderMyCard(me);
   }
 }
 
-// ── chat ───────────────────────────────────────────────────
-async function loadmsgs(){
+// ── CHAT ───────────────────────────────────────────────────
+async function loadMsgs(){
   const {data}=await db.from("messages").select("*").order("created_at",{ascending:true}).limit(100);
-  chatmessages=data||[];
-  rendermsgs();
+  chatMessages=data||[];
+  renderMsgs();
 }
 
-function rendermsgs(){
-  const box=document.getelementbyid("chatmsgs");
-  if(!chatmessages.length){box.innerhtml=\'<div class="loader-txt">нет сообщений</div>\';return;}
-  box.innerhtml=chatmessages.map(m=>{
-    const mine=currentuser&&m.user_id===currentuser.id;
+function renderMsgs(){
+  const box=document.getElementById("chatMsgs");
+  if(!chatMessages.length){box.innerHTML='<div class="loader-txt">Нет сообщений</div>';return;}
+  box.innerHTML=chatMessages.map(m=>{
+    const mine=currentUser&&m.user_id===currentUser.id;
     const av=m.avatar_url?`<img src="${m.avatar_url}" alt="">`:initials(m.username);
     return `<div class="msg${mine?" mine":""}">
       <div class="msg-av">${av}</div>
       <div class="msg-body">
         <div class="msg-name">${m.username||"?"}</div>
         <div class="msg-bubble">${esc(m.text)}</div>
-        <div class="msg-time">${timeago(m.created_at)}</div>
+        <div class="msg-time">${timeAgo(m.created_at)}</div>
       </div>
     </div>`;
   }).join("");
-  box.scrolltop=box.scrollheight;
+  box.scrollTop=box.scrollHeight;
 }
 
-async function sendmsg(){
-  if(!currentuser)return;
-  const inp=document.getelementbyid("chatin");
+async function sendMsg(){
+  if(!currentUser)return;
+  const inp=document.getElementById("chatIn");
   const text=inp.value.trim();
   if(!text)return;
-  const btn=document.getelementbyid("chatbtn");
+  const btn=document.getElementById("chatBtn");
   btn.disabled=true;
   inp.value="";
-  const meta=currentuser.user_metadata||{};
+  const meta=currentUser.user_metadata||{};
   const {error}=await db.from("messages").insert({
-    user_id:currentuser.id,
-    username:meta.full_name||meta.name||currentuser.email?.split("@")[0]||"user",
+    user_id:currentUser.id,
+    username:meta.full_name||meta.name||currentUser.email?.split("@")[0]||"User",
     avatar_url:meta.avatar_url||meta.picture||null,
     text
   });
   if(error){console.error(error);inp.value=text;}
   else{
-    mymsgcount++;
-    document.getelementbyid("statmsgs").textcontent=mymsgcount;
-    checkachievements();
+    myMsgCount++;
+    document.getElementById("statMsgs").textContent=myMsgCount;
+    checkAchievements();
   }
   btn.disabled=false;
   inp.focus();
 }
 
-// ── screens ────────────────────────────────────────────────
-function showel(id){["loadingscreen","loginscreen","appscreen"].foreach(i=>document.getelementbyid(i).style.display=i===id?"block":"none");}
+// ── SCREENS ────────────────────────────────────────────────
+function showEl(id){["loadingScreen","loginScreen","appScreen"].forEach(i=>document.getElementById(i).style.display=i===id?"block":"none");}
 
-// ── realtime ───────────────────────────────────────────────
-db.channel("profiles-rt").on("postgres_changes",{event:"*",schema:"public",table:"profiles"},loadall).subscribe();
-db.channel("messages-rt").on("postgres_changes",{event:"insert",schema:"public",table:"messages"},payload=>{
-  chatmessages.push(payload.new);
-  rendermsgs();
+// ── REALTIME ───────────────────────────────────────────────
+db.channel("profiles-rt").on("postgres_changes",{event:"*",schema:"public",table:"profiles"},loadAll).subscribe();
+db.channel("messages-rt").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+  chatMessages.push(payload.new);
+  renderMsgs();
 }).subscribe();
 
-// ── init ───────────────────────────────────────────────────
-db.auth.onauthstatechange(async(event,session)=>{
+// ── INIT ───────────────────────────────────────────────────
+db.auth.onAuthStateChange(async(event,session)=>{
   if(session?.user){
-    currentuser=session.user;
-    const meta=currentuser.user_metadata||{};
-    rendermycard({
-      username:meta.full_name||meta.name||currentuser.email?.split("@")[0]||"user",
+    currentUser=session.user;
+    const meta=currentUser.user_metadata||{};
+    renderMyCard({
+      username:meta.full_name||meta.name||currentUser.email?.split("@")[0]||"User",
       avatar_url:meta.avatar_url||meta.picture||null,
       status:"studying"
     });
-    showel("appscreen");
-    await ensureprofile(currentuser);
-    await loadall();
-    await loadmsgs();
-    sessaction("studying");
+    showEl("appScreen");
+    await ensureProfile(currentUser);
+    await loadAll();
+    await loadMsgs();
+    sessAction("studying");
   } else {
-    currentuser=null;
-    stopstudytimer();
-    stopsesstimer();
-    showel("loginscreen");
+    currentUser=null;
+    stopStudyTimer();
+    stopSessTimer();
+    showEl("loginScreen");
   }
 });
 
-showel("loadingscreen");
+showEl("loadingScreen");
 </script>
 </body>
 </html>
