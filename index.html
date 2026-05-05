@@ -122,6 +122,23 @@
     .chat-send:hover{transform:scale(1.05)}
     .chat-send:disabled{opacity:0.4;cursor:default;transform:none}
 
+
+    /* ACHIEVEMENTS */
+    .achv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    .achv-card{padding:14px;border-radius:12px;background:#1e1e2e;border:1px solid rgba(255,255,255,0.06);position:relative;transition:all 0.2s}
+    .achv-card.locked{opacity:0.35;filter:grayscale(0.8)}
+    .achv-card.unlocked.legendary{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.35)}
+    .achv-card.unlocked.epic{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.35)}
+    .achv-card.unlocked.common{background:rgba(7,202,107,0.06);border-color:rgba(7,202,107,0.25)}
+    .achv-icon{font-size:1.6rem;margin-bottom:6px}
+    .achv-name{font-size:0.82rem;font-weight:700;margin-bottom:3px}
+    .achv-desc{font-size:0.7rem;color:rgba(255,255,255,0.45);line-height:1.4}
+    .achv-rarity{display:inline-block;margin-top:6px;font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:4px}
+    .rarity-common{background:rgba(7,202,107,0.15);color:#07CA6B}
+    .rarity-epic{background:rgba(167,139,250,0.15);color:#a78bfa}
+    .rarity-legendary{background:rgba(251,191,36,0.15);color:#fbbf24}
+    .achv-check{position:absolute;top:10px;right:10px;font-size:0.75rem;color:#07CA6B}
+
     /* TOAST */
     #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e1e2e;border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:12px 20px;font-size:0.85rem;font-weight:600;z-index:999;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
     #toast.show{transform:translateX(-50%) translateY(0)}
@@ -244,9 +261,10 @@
     </div>
 
     <!-- TABS -->
-    <div class="tabs">
+    <div class="tabs" style="grid-template-columns:1fr 1fr 1fr">
       <button class="tab active" id="tabMembers" onclick="switchTab('members')">👥 Участники</button>
       <button class="tab" id="tabRating"  onclick="switchTab('rating')">🏆 Рейтинг</button>
+      <button class="tab" id="tabAchv"    onclick="switchTab('achv')">🎖 Достижения</button>
     </div>
 
     <div id="panelMembers" class="panel active">
@@ -254,6 +272,9 @@
     </div>
     <div id="panelRating" class="panel">
       <div id="lbList"><div class="loader-txt">Загрузка…</div></div>
+    </div>
+    <div id="panelAchv" class="panel">
+      <div class="achv-grid" id="achvGrid"><div class="loader-txt" style="grid-column:span 2">Загрузка…</div></div>
     </div>
 
     <!-- CHAT -->
@@ -337,11 +358,52 @@ function showToast(msg){
 
 // ── TABS ───────────────────────────────────────────────────
 function switchTab(tab){
-  ["members","rating"].forEach(t=>{
+  ["members","rating","achv"].forEach(t=>{
     document.getElementById("panel"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active",t===tab);
     document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active",t===tab);
   });
   if(tab==="rating") renderLeaderboard();
+  if(tab==="achv")   renderAchievements();
+}
+
+// ── ACHIEVEMENTS ───────────────────────────────────────────
+const ACHIEVEMENTS = [
+  { key:"first_session",  icon:"🌱", name:"Первый шаг",      desc:"Провёл первую учебную сессию",      rarity:"common",    check:(d)=>d.sessions>=1 },
+  { key:"chat_active",    icon:"💬", name:"Активист",         desc:"Написал 20 сообщений в чате",        rarity:"common",    check:(d)=>d.msgs>=20 },
+  { key:"hour_study",     icon:"⏰", name:"Час учёбы",        desc:"Набрал 1 час суммарно",              rarity:"common",    check:(d)=>d.totalSecs>=3600 },
+  { key:"ten_sessions",   icon:"📅", name:"Регулярность",     desc:"Провёл 10 учебных сессий",           rarity:"epic",      check:(d)=>d.sessions>=10 },
+  { key:"dedication",     icon:"💪", name:"Дедикация",        desc:"Набрал 10 часов суммарно",           rarity:"epic",      check:(d)=>d.totalSecs>=36000 },
+  { key:"chat_legend",    icon:"🎙", name:"Душа компании",    desc:"Написал 50 сообщений в чате",        rarity:"epic",      check:(d)=>d.msgs>=50 },
+  { key:"workaholic",     icon:"🔥", name:"Трудоголик",       desc:"Набрал 6 часов учёбы суммарно",      rarity:"epic",      check:(d)=>d.totalSecs>=21600 },
+  { key:"legend_20h",     icon:"⚡", name:"Легенда",          desc:"Набрал 20 часов суммарно",           rarity:"legendary", check:(d)=>d.totalSecs>=72000 },
+  { key:"podium",         icon:"🏆", name:"Пьедестал",        desc:"Вошёл в топ-3 рейтинга",            rarity:"legendary", check:(d)=>d.topThree },
+];
+
+function getCheckData(){
+  const sorted=[...allProfiles].sort((a,b)=>(b.study_seconds||0)-(a.study_seconds||0));
+  const topThree=sorted.slice(0,3).some(p=>currentUser&&p.id===currentUser.id);
+  return{
+    sessions: mySessions,
+    totalSecs: studySeconds,
+    msgs: myMsgCount,
+    topThree,
+  };
+}
+
+function renderAchievements(){
+  const grid=document.getElementById("achvGrid");
+  const d=getCheckData();
+  const rarityLabel={common:"Обычное",epic:"Эпическое",legendary:"Легендарное"};
+  grid.innerHTML=ACHIEVEMENTS.map(a=>{
+    const unlocked=a.check(d);
+    return `<div class="achv-card ${unlocked?"unlocked "+a.rarity:"locked"}">
+      ${unlocked?'<div class="achv-check">✓</div>':""}
+      <div class="achv-icon">${a.icon}</div>
+      <div class="achv-name">${a.name}</div>
+      <div class="achv-desc">${a.desc}</div>
+      <span class="achv-rarity rarity-${a.rarity}">${rarityLabel[a.rarity]}</span>
+    </div>`;
+  }).join("");
 }
 
 // ── SESSION TIMER (display only) ───────────────────────────
